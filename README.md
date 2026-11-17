@@ -77,22 +77,14 @@ Preferences are stored locally in the browser and do not require an account.
 
 MasterClock LED is a standalone HTML application.
 
-**Option 1 – Run locally**
+## Live
 
-1. Download `index.html`.
-2. Open the file in a modern web browser.
-3. Allow internet access for external time synchronization.
+**[Open MasterClock Lite – Live ](https://lojewskistudio.github.io/MasterClock-Lite/)**
 
-**Option 2 – Host on GitHub Pages**
+The application runs directly in your browser. No installation, downloads, server or additional configuration required.
 
-1. Create a GitHub repository.
-2. Upload the HTML file.
-3. Enable GitHub Pages in the repository settings.
-4. Open the published page in a browser.
+Internet access is required for external time synchronization.
 
-No build process, package installation or backend configuration is required.
-
-For the HTTP Date fallback, the application must be served over HTTP or HTTPS. Local file execution does not provide this fallback.
 
 ## Technical Details
 
