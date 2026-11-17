@@ -2,6 +2,9 @@
 
 **A browser-based synchronized clock for studios, control rooms and live production environments.**
 
+<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/40874a4f-273a-42bf-bd37-e183e5c74ceb" />
+
+
 MasterClock LED is a lightweight, standalone HTML clock designed for environments where a clear and reliable time reference is essential.
 
 Unlike a conventional clock that simply displays the computer's system time, MasterClock LED attempts to synchronize its internal time reference with external UTC time services. It estimates the difference between the device clock and external time sources, then uses that offset to maintain a continuously updated display.
