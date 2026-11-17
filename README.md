@@ -1,13 +1,12 @@
-# MasterClock LED
+# MasterClock Lite
 
 **A browser-based synchronized clock for studios, control rooms and live production environments.**
 
-<img width="1920" height="1080" alt="image" src="https://github.com/user-attachments/assets/40874a4f-273a-42bf-bd37-e183e5c74ceb" />
+<img width="1920" height="1080" alt="MasterClock Lite" src="https://github.com/user-attachments/assets/40874a4f-273a-42bf-bd37-e183e5c74ceb" />
 
+MasterClock Lite is a lightweight, standalone HTML clock designed for environments where a clear and reliable time reference is essential.
 
-MasterClock LED is a lightweight, standalone HTML clock designed for environments where a clear and reliable time reference is essential.
-
-Unlike a conventional clock that simply displays the computer's system time, MasterClock LED attempts to synchronize its internal time reference with external UTC time services. It estimates the difference between the device clock and external time sources, then uses that offset to maintain a continuously updated display.
+Unlike a conventional clock that simply displays the computer's system time, MasterClock Lite attempts to synchronize its internal time reference with external UTC time services. It estimates the difference between the device clock and external time sources, then uses that offset to maintain a continuously updated display.
 
 The application runs entirely in the browser, without requiring a dedicated server, backend or additional software installation.
 
@@ -28,7 +27,7 @@ The application runs entirely in the browser, without requiring a dedicated serv
 
 ## Time Synchronization
 
-MasterClock LED uses a lightweight client-side synchronization mechanism.
+MasterClock Lite uses a lightweight, client-side synchronization mechanism.
 
 The synchronization process includes:
 
@@ -73,18 +72,13 @@ The settings panel allows users to customize:
 
 Preferences are stored locally in the browser and do not require an account.
 
-## Installation and Usage
+## ## Access the Clock
 
-MasterClock LED is a standalone HTML application.
+**[Open MasterClock Lite](https://lojewskistudio.github.io/MasterClock-Lite/)**
 
-## Live
-
-**[Open MasterClock Lite – Live ](https://lojewskistudio.github.io/MasterClock-Lite/)**
-
-The application runs directly in your browser. No installation, downloads, server or additional configuration required.
+MasterClock Lite runs directly in your browser. No installation, downloads or additional configuration required.
 
 Internet access is required for external time synchronization.
-
 
 ## Technical Details
 
@@ -101,7 +95,7 @@ No external JavaScript libraries or frameworks are required.
 
 ## Important Notes
 
-MasterClock LED is a browser-based time reference, not a certified precision timekeeping instrument.
+MasterClock Lite is a browser-based time reference, not a certified precision timekeeping instrument.
 
 Its actual accuracy depends on network latency, external service availability, server response timestamps, browser execution and the hosting environment.
 
@@ -121,7 +115,7 @@ See [LICENSE](LICENSE) for details.
 
 ---
 
-**MasterClock LED**
+**MasterClock Lite**
 
 *An independent time reference, directly in your browser.*
 
