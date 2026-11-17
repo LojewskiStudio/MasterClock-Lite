@@ -72,7 +72,7 @@ The settings panel allows users to customize:
 
 Preferences are stored locally in the browser and do not require an account.
 
-## ## Access the Clock
+## Browser Application
 
 **[Open MasterClock Lite](https://lojewskistudio.github.io/MasterClock-Lite/)**
 
