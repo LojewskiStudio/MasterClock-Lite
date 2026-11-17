@@ -109,7 +109,7 @@ For professional broadcast or mission-critical timing applications, independent 
 
 MIT License.
 
-Copyright (c) 2026 Mihai Lucian Lojewski – Lojewski Studio.
+Copyright (c) 2026 Mihai Lucian Lojewski / Lojewski Studio.
 
 See [LICENSE](LICENSE) for details.
 
