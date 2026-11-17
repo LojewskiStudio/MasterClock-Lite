@@ -646,7 +646,6 @@
         <option value="sleek"        data-i18n="variantSleek">Sleek</option>
         <option value="neon"         data-i18n="variantNeon">Neon</option>
         <option value="bars"         data-i18n="variantBars">Bars</option>
-        <option value="sleek"        data-i18n="variantSleek">Sleek</option>
         <option value="minimal"      data-i18n="variantMinimal">Minimal</option>
         <option value="modern"       data-i18n="variantModern">Modern</option>
         <option value="matrix"       data-i18n="variantMatrix">Matrix</option>
@@ -831,15 +830,9 @@
 
     const LANG_ALIASES = { nb: 'no', nn: 'no' };
     function detectLanguage() {
-      const stored = localStorage.getItem('masterclock-lang');
-      if (stored && I18N[stored]) return stored;
-      const raw = (navigator.language || 'en').toLowerCase();
-      const short = raw.split('-')[0];
-      if (I18N[short]) return short;
-      if (LANG_ALIASES[short] && I18N[LANG_ALIASES[short]]) return LANG_ALIASES[short];
-      return 'en';
+       const stored = localStorage.getItem('masterclock-lang');
+       return stored && I18N[stored] ? stored : 'en';
     }
-
     const circle           = document.getElementById('circle');
     const digitalClock     = document.getElementById('digitalClock');
     const digitalDate      = document.getElementById('digitalDate');
