@@ -17,8 +17,8 @@
        2. Base layout
        3. Shared text elements
        4. Components (LEDs, hands, bars, progress)
-       5. Visibility map  ← which element is shown in which variant
-       6. Variants        ← one block per variant
+       5. Visibility map  ← which element is shown in which model
+       6. Models        ← one block per model
        7. UI (settings, status bar)
        8. Responsive
        ═══════════════════════════════════════════════════════════ */
@@ -27,37 +27,43 @@
     :root {
       --chrome: 96px;                       /* vertical space kept free for the status bar */
       --hour-hand-w: 6px; --min-hand-w: 4px; --sec-hand-w: 2px;
-      /* rectangular variants (neon, bars, terminal, hud, sleek) */
+      /* rectangular models (neon, bars, terminal, hud, sleek) */
       --ar-w: 16; --ar-h: 9; --rect-vw: 94vw; --rect-max: 900px; --radius: 16px;
     }
     :root, html[data-theme="classic"] {
       --green:#0FFF50; --amber:#ff9100; --red:#ff3131; --precis:#b3b3b3;
       --hour-on:#00d83a; --hour-off:#14521c; --sec-off:#5d1111;
+      --yell:#fcffcd; --blu:#39fff5;
       --face-bg:#000000f3; --page-bg:#000;
     }
     html[data-theme="cyan"] {
       --green:#00e5ff; --amber:#2979ff; --red:#ff2d78;
       --hour-on:#0091ea; --hour-off:#0d3a44; --sec-off:#4a0e22;
+      --yell:#ffd769; --blu:#fff239;
       --face-bg:#000d14; --page-bg:#00060a;
     }
     html[data-theme="amber"] {
       --green:#ffb300; --amber:#ff6d00; --red:#ff1744;
       --hour-on:#ff8f00; --hour-off:#3d2b00; --sec-off:#5d1015;
+       --yell:#f1ff26; --blu:#ff8839;
       --face-bg:#0a0800; --page-bg:#060500;
     }
     html[data-theme="mono"] {
       --green:#f0f0f0; --amber:#999999; --red:#ffffff;
       --hour-on:#cccccc; --hour-off:#262626; --sec-off:#262626;
+       --yell:#ffffff; --blu:#c7c7c7;
       --face-bg:#0a0a0a; --page-bg:#000;
     }
     html[data-theme="vaporwave"] {
       --green:#ff2d95; --amber:#c200ff; --red:#00e0ff;
       --hour-on:#b829a8; --hour-off:#3d0a26; --sec-off:#0d3540;
+       --yell:#ffcde8; --blu:#ff3995;
       --face-bg:#0a0014; --page-bg:#050008;
     }
     html[data-theme="matrix"] {
       --green:#00ff41; --amber:#00a82b; --red:#ff0000;
       --hour-on:#00d633; --hour-off:#06210b; --sec-off:#4d0000;
+       --yell:#00ff0d; --blu:#39ff43;
       --face-bg:#000800; --page-bg:#000300;
     }
 
@@ -76,8 +82,8 @@
       border-radius:50%; background:var(--face-bg); box-shadow:0 0 40px #030303;
       transition:border-radius .25s, width .25s, aspect-ratio .25s;
     }
-    /* Shared geometry of the rectangular variants */
-    #circle:is(.variant-neon, .variant-bars, .variant-terminal, .variant-hud, .variant-sleek) {
+    /* Shared geometry of the rectangular models */
+    #circle:is(.model-neon, .model-bars, .model-terminal, .model-hud, .model-sleek) {
       aspect-ratio:var(--ar-w) / var(--ar-h);
       width:min(var(--rect-vw), calc((100dvh - var(--chrome)) * var(--ar-w) / var(--ar-h)), var(--rect-max));
       border-radius:var(--radius);
@@ -230,75 +236,75 @@
 
     /* ── 5. Visibility map ───────────────────────────────────────
        Optional elements are hidden by default and switched on
-       per variant. To add a variant, edit only this section.     */
+       per model. To add a model, edit only this section.     */
     .led, .hour-led, .countdown, .progress-bar-container, .analog-hands, .matrix-canvas,
     .bars-row, .term-bar, .term-prompt, .term-cursor, .hud-frame, .sleek-status { display:none; }
 
-    #circle:is(.variant-room-control, .variant-analog, .variant-sleek-analog) :is(.led, .hour-led) { display:block; }
-    #circle:is(.variant-room-control, .variant-minimal, .variant-terminal, .variant-hud) .countdown { display:block; }
-    #circle:is(.variant-room-control, .variant-modern, .variant-neon) .progress-bar-container { display:block; }
-    #circle:is(.variant-analog, .variant-sleek-analog) .analog-hands { display:block; }
-    #circle.variant-matrix   .matrix-canvas { display:block; }
-    #circle.variant-bars     .bars-row      { display:flex; }
-    #circle.variant-terminal :is(.term-bar, .term-prompt) { display:flex; }
-    #circle.variant-terminal .term-cursor   { display:block; }
-    #circle.variant-hud      .hud-frame     { display:block; }
-    #circle.variant-sleek    .sleek-status  { display:flex; }
+    #circle:is(.model-room-control, .model-analog, .model-sleek-analog) :is(.led, .hour-led) { display:block; }
+    #circle:is(.model-room-control, .model-minimal, .model-terminal, .model-hud) .countdown { display:block; }
+    #circle:is(.model-room-control, .model-modern, .model-neon) .progress-bar-container { display:block; }
+    #circle:is(.model-analog, .model-sleek-analog) .analog-hands { display:block; }
+    #circle.model-matrix   .matrix-canvas { display:block; }
+    #circle.model-bars     .bars-row      { display:flex; }
+    #circle.model-terminal :is(.term-bar, .term-prompt) { display:flex; }
+    #circle.model-terminal .term-cursor   { display:block; }
+    #circle.model-hud      .hud-frame     { display:block; }
+    #circle.model-sleek    .sleek-status  { display:flex; }
 
-    /* Elements that are visible by default but hidden in some variants */
-    #circle:is(.variant-analog, .variant-sleek-analog) .digital-clock,
-    #circle.variant-sleek-analog .digital-date,
-    #circle.variant-sleek :is(.precision-clock, .tz-label, .signature) { display:none; }
-    #circle.variant-sleek ~ .live-status { display:none; }
+    /* Elements that are visible by default but hidden in some models */
+    #circle:is(.model-analog, .model-sleek-analog) .digital-clock,
+    #circle.model-sleek-analog .digital-date,
+    #circle.model-sleek :is(.precision-clock, .tz-label, .signature) { display:none; }
+    #circle.model-sleek ~ .live-status { display:none; }
 
     /* Text outline is only used by the "classic" looks */
-    #circle:is(.variant-minimal, .variant-neon, .variant-bars, .variant-matrix, .variant-terminal, .variant-hud, .variant-sleek)
+    #circle:is(.model-minimal, .model-neon, .model-bars, .model-matrix, .model-terminal, .model-hud, .model-sleek, .model-big-display)
       :is(.digital-clock, .digital-date, .countdown) { -webkit-text-stroke:0; }
 
-    /* ── 6. Variants ─────────────────────────────────────────── */
+    /* ── 6. models ─────────────────────────────────────────── */
 
     /* room-control: default look, no overrides needed */
 
     /* Analog */
-    #circle.variant-analog .led { width:clamp(3px,1cqmin,6px); height:clamp(3px,1cqmin,6px); background:#333; opacity:.6; }
-    #circle.variant-analog .led.on { background:var(--red); opacity:1; }
-    #circle.variant-analog .hour-led { width:clamp(5px,1.6cqmin,10px); height:clamp(5px,1.6cqmin,10px); background:#4a4a4a; opacity:.7; }
-    #circle.variant-analog .hour-led.on { background:var(--green); opacity:1; }
-    #circle.variant-analog .digital-date { top:24%; font-size:clamp(.7rem, 3.2cqmin, 1.5rem); }
+    #circle.model-analog .led { width:clamp(3px,1cqmin,6px); height:clamp(3px,1cqmin,6px); background:#333; opacity:.6; }
+    #circle.model-analog .led.on { background:var(--red); opacity:1; }
+    #circle.model-analog .hour-led { width:clamp(5px,1.6cqmin,10px); height:clamp(5px,1.6cqmin,10px); background:#4a4a4a; opacity:.7; }
+    #circle.model-analog .hour-led.on { background:var(--green); opacity:1; }
+    #circle.model-analog .digital-date { top:24%; font-size:clamp(.7rem, 3.2cqmin, 1.5rem); }
 
     /* Sleek Analog */
-    #circle.variant-sleek-analog { background:var(--face-bg); box-shadow:0 0 40px #030303; }
-    #circle.variant-sleek-analog .hour-led {
+    #circle.model-sleek-analog { background:var(--face-bg); box-shadow:0 0 40px #030303; }
+    #circle.model-sleek-analog .hour-led {
       width:clamp(3px,.8cqmin,5px); height:clamp(12px,3.5cqmin,18px); border-radius:1px;
       background:#5c6f8a; opacity:1; transform:translate(-50%,-50%) rotate(var(--rot, 0deg));
     }
-    #circle.variant-sleek-analog .hour-led.on { background:#a4bcd6; box-shadow:0 0 8px #a4bcd6; }
-    #circle.variant-sleek-analog .led {
+    #circle.model-sleek-analog .hour-led.on { background:#a4bcd6; box-shadow:0 0 8px #a4bcd6; }
+    #circle.model-sleek-analog .led {
       width:clamp(2px,.5cqmin,3px); height:clamp(6px,1.8cqmin,10px); border-radius:1px;
       background:#36445c; opacity:1; transform:translate(-50%,-50%) rotate(var(--rot, 0deg));
     }
-    #circle.variant-sleek-analog .led.on { background:#a4bcd6; }
-    #circle.variant-sleek-analog .hour-hand   { height:22%; background:#a4bcd6; box-shadow:none; }
-    #circle.variant-sleek-analog .minute-hand { height:34%; background:#a4bcd6; box-shadow:none; }
-    #circle.variant-sleek-analog .second-hand { height:38%; background:#ff7b00; box-shadow:none; }
-    #circle.variant-sleek-analog .analog-center { width:14px; height:14px; margin:-7px 0 0 -7px; background:#ff7b00; box-shadow:none; }
-    #circle.variant-sleek-analog .tz-label { top:74%; bottom:auto; color:#a4bcd6; opacity:1; font-size:clamp(.6rem,2.2cqmin,1.1rem); letter-spacing:.1em; }
-    #circle.variant-sleek-analog .precision-clock { top:76.5%; bottom:auto; color:#9e5c1e; opacity:1; font-size:clamp(.7rem,2.5cqmin,1.2rem); }
-    #circle.variant-sleek-analog .signature { top:80%; bottom:auto; color:#5c6f8a; opacity:.7; font-size:clamp(.5rem,1.5cqmin,.8rem); }
+    #circle.model-sleek-analog .led.on { background:#a4bcd6; }
+    #circle.model-sleek-analog .hour-hand   { height:22%; background:#a4bcd6; box-shadow:none; }
+    #circle.model-sleek-analog .minute-hand { height:34%; background:#a4bcd6; box-shadow:none; }
+    #circle.model-sleek-analog .second-hand { height:38%; background:#ff7b00; box-shadow:none; }
+    #circle.model-sleek-analog .analog-center { width:14px; height:14px; margin:-7px 0 0 -7px; background:#ff7b00; box-shadow:none; }
+    #circle.model-sleek-analog .tz-label { top:74%; bottom:auto; color:#a4bcd6; opacity:1; font-size:clamp(.6rem,2.2cqmin,1.1rem); letter-spacing:.1em; }
+    #circle.model-sleek-analog .precision-clock { top:76.5%; bottom:auto; color:#9e5c1e; opacity:1; font-size:clamp(.7rem,2.5cqmin,1.2rem); }
+    #circle.model-sleek-analog .signature { top:80%; bottom:auto; color:#5c6f8a; opacity:.7; font-size:clamp(.5rem,1.5cqmin,.8rem); }
 
     /* Minimal */
-    #circle.variant-minimal .digital-clock {
+    #circle.model-minimal .digital-clock {
       top:50%; font-size:clamp(1.8rem, 18cqmin, 8.5rem);
       text-shadow:0 0 24px color-mix(in srgb, var(--green) 35%, transparent);
     }
-    #circle.variant-minimal .digital-clock.h12 { font-size:clamp(1.4rem, 14cqmin, 6.8rem); }
-    #circle.variant-minimal .digital-date { top:38%; font-size:clamp(.65rem, 3.2cqmin, 1.3rem); opacity:.85; }
-    #circle.variant-minimal .precision-clock { bottom:24%; font-size:clamp(.55rem, 1.8cqmin, 1rem); }
-    #circle.variant-minimal .tz-label { bottom:68%; }
-    #circle.variant-minimal .signature { bottom:22%; }
+    #circle.model-minimal .digital-clock.h12 { font-size:clamp(1.4rem, 14cqmin, 6.8rem); }
+    #circle.model-minimal .digital-date { top:38%; font-size:clamp(.65rem, 3.2cqmin, 1.3rem); opacity:.85; }
+    #circle.model-minimal .precision-clock { bottom:24%; font-size:clamp(.55rem, 1.8cqmin, 1rem); }
+    #circle.model-minimal .tz-label { bottom:68%; }
+    #circle.model-minimal .signature { bottom:22%; }
 
     /* Modern */
-    #circle.variant-modern::after {
+    #circle.model-modern::after {
       content:''; position:absolute; inset:2%; border-radius:50%; pointer-events:none; z-index:0;
       background:conic-gradient(from 0deg,
         var(--modern-color, var(--green)) 0deg,
@@ -307,82 +313,82 @@
       -webkit-mask:radial-gradient(circle, transparent calc(100% - 10px), #000 calc(100% - 10px));
               mask:radial-gradient(circle, transparent calc(100% - 10px), #000 calc(100% - 10px));
     }
-    #circle.variant-modern .digital-clock { z-index:1; }
-    #circle.variant-modern .signature { z-index:1; bottom:26%; }
-    #circle.variant-modern .precision-clock { bottom:29%; }
-    #circle.variant-modern .tz-label { bottom:32%; }
-    #circle.variant-modern .progress-bar-container {
+    #circle.model-modern .digital-clock { z-index:1; }
+    #circle.model-modern .signature { z-index:1; bottom:26%; }
+    #circle.model-modern .precision-clock { bottom:29%; }
+    #circle.model-modern .tz-label { bottom:32%; }
+    #circle.model-modern .progress-bar-container {
       top:auto; bottom:35%; width:120%; height:20px; border:none;
       background:color-mix(in srgb, var(--green) 15%, transparent);
     }
-    #circle.variant-modern .progress-bar-fill { border-radius:3px; box-shadow:0 0 8px currentColor; }
+    #circle.model-modern .progress-bar-fill { border-radius:3px; box-shadow:0 0 8px currentColor; }
 
     /* Neon */
-    #circle.variant-neon {
+    #circle.model-neon {
       background:var(--face-bg); overflow:hidden;
       border:1px solid color-mix(in srgb, var(--green) 60%, transparent);
       box-shadow:0 0 50px color-mix(in srgb, var(--green) 20%, transparent),
                  inset 0 0 80px color-mix(in srgb, var(--green) 6%, transparent);
     }
-    #circle.variant-neon::before {
+    #circle.model-neon::before {
       content:''; position:absolute; inset:0; pointer-events:none; z-index:0; opacity:.6;
       background-image:
         repeating-linear-gradient(0deg,  transparent, transparent 19px, color-mix(in srgb, var(--green) 8%, transparent) 19px, color-mix(in srgb, var(--green) 8%, transparent) 20px),
         repeating-linear-gradient(90deg, transparent, transparent 19px, color-mix(in srgb, var(--green) 8%, transparent) 19px, color-mix(in srgb, var(--green) 8%, transparent) 20px);
     }
-    #circle.variant-neon::after {
+    #circle.model-neon::after {
       content:''; position:absolute; inset:0; pointer-events:none; z-index:3;
       background:repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.18) 2px, rgba(0,0,0,.18) 4px);
       animation:scan 8s linear infinite;
     }
     @keyframes scan { from { transform:translateY(0); } to { transform:translateY(20px); } }
-    #circle.variant-neon .digital-clock {
+    #circle.model-neon .digital-clock {
       top:48%; z-index:1; font-size:clamp(2rem, 18cqmin, 7rem);
       text-shadow:0 0 24px var(--green), 0 0 48px color-mix(in srgb, var(--green) 40%, transparent);
     }
-    #circle.variant-neon .digital-clock.h12 { font-size:clamp(1.5rem, 14cqmin, 5.5rem); }
-    #circle.variant-neon .digital-date {
+    #circle.model-neon .digital-clock.h12 { font-size:clamp(1.5rem, 14cqmin, 5.5rem); }
+    #circle.model-neon .digital-date {
       top:10%; left:5%; transform:none; text-align:left; z-index:2;
       font-size:clamp(.6rem, 2.8cqmin, 1.1rem); letter-spacing:.08em;
     }
-    #circle.variant-neon .precision-clock { bottom:22%; left:5%; transform:none; text-align:left; z-index:2; font-size:clamp(.55rem, 1.8cqmin, 1rem); }
-    #circle.variant-neon .tz-label { bottom:22%; left:auto; right:5%; transform:none; text-align:right; max-width:45%; z-index:2; }
-    #circle.variant-neon .signature { top:5%; bottom:auto; left:auto; right:5%; transform:none; opacity:.4; z-index:2; font-size:clamp(.5rem, 1.4cqmin, .8rem); }
-    #circle.variant-neon .progress-bar-container {
+    #circle.model-neon .precision-clock { bottom:22%; left:5%; transform:none; text-align:left; z-index:2; font-size:clamp(.55rem, 1.8cqmin, 1rem); }
+    #circle.model-neon .tz-label { bottom:22%; left:auto; right:5%; transform:none; text-align:right; max-width:45%; z-index:2; }
+    #circle.model-neon .signature { top:5%; bottom:auto; left:auto; right:5%; transform:none; opacity:.4; z-index:2; font-size:clamp(.5rem, 1.4cqmin, .8rem); }
+    #circle.model-neon .progress-bar-container {
       top:auto; bottom:8%; left:5%; right:5%; width:auto; transform:none; height:3px; z-index:2;
       border:none; border-radius:0; background:color-mix(in srgb, var(--green) 15%, transparent);
     }
-    #circle.variant-neon .progress-bar-fill { border-radius:0; box-shadow:0 0 8px var(--green); }
+    #circle.model-neon .progress-bar-fill { border-radius:0; box-shadow:0 0 8px var(--green); }
 
     /* Bars */
-    #circle.variant-bars { background:var(--face-bg); border:1px solid color-mix(in srgb, var(--green) 25%, transparent); }
-    #circle.variant-bars .digital-clock {
+    #circle.model-bars { background:var(--face-bg); border:1px solid color-mix(in srgb, var(--green) 25%, transparent); }
+    #circle.model-bars .digital-clock {
       top:40%; font-size:clamp(1.8rem, 13cqmin, 5rem);
       text-shadow:0 0 12px color-mix(in srgb, var(--green) 30%, transparent);
     }
-    #circle.variant-bars .digital-clock.h12 { font-size:clamp(1.4rem, 10cqmin, 4rem); }
-    #circle.variant-bars .digital-date { top:12%; font-size:clamp(.6rem, 3cqmin, 1.2rem); }
-    #circle.variant-bars .precision-clock { top:58%; bottom:auto; font-size:clamp(.55rem, 1.9cqmin, 1rem); }
-    #circle.variant-bars .tz-label { top:22%; bottom:auto; font-size:clamp(.5rem, 1.8cqmin, .85rem); }
-    #circle.variant-bars .signature { bottom:2%; opacity:.35; font-size:clamp(.5rem, 1.2cqmin, .75rem); }
+    #circle.model-bars .digital-clock.h12 { font-size:clamp(1.4rem, 10cqmin, 4rem); }
+    #circle.model-bars .digital-date { top:12%; font-size:clamp(.6rem, 3cqmin, 1.2rem); }
+    #circle.model-bars .precision-clock { top:58%; bottom:auto; font-size:clamp(.55rem, 1.9cqmin, 1rem); }
+    #circle.model-bars .tz-label { top:22%; bottom:auto; font-size:clamp(.5rem, 1.8cqmin, .85rem); }
+    #circle.model-bars .signature { bottom:2%; opacity:.35; font-size:clamp(.5rem, 1.2cqmin, .75rem); }
 
     /* Matrix */
-    #circle.variant-matrix .digital-clock {
+    #circle.model-matrix .digital-clock {
       z-index:3; -webkit-text-stroke:min(2px,.04em) #000;
       text-shadow:0 0 20px var(--green), 0 0 40px var(--green), 0 0 60px color-mix(in srgb, var(--green) 60%, transparent);
     }
-    #circle.variant-matrix .digital-date { z-index:3; text-shadow:0 0 10px var(--amber); }
-    #circle.variant-matrix :is(.precision-clock, .tz-label, .signature) { z-index:3; }
+    #circle.model-matrix .digital-date { z-index:3; text-shadow:0 0 10px var(--amber); }
+    #circle.model-matrix :is(.precision-clock, .tz-label, .signature) { z-index:3; }
 
     /* Terminal */
-    #circle.variant-terminal {
+    #circle.model-terminal {
       --ar-w:16; --ar-h:10; --rect-vw:92vw; --rect-max:860px; --radius:10px;
       background:color-mix(in srgb, var(--face-bg) 85%, var(--green) 15%); overflow:hidden;
       border:1px solid color-mix(in srgb, var(--green) 40%, transparent);
       box-shadow:0 0 40px color-mix(in srgb, var(--green) 15%, transparent), inset 0 0 100px color-mix(in srgb, var(--green) 3%, transparent);
       font-family:ui-monospace, 'SF Mono', 'Consolas', 'Courier New', monospace;
     }
-    #circle.variant-terminal::after {
+    #circle.model-terminal::after {
       content:''; position:absolute; inset:0; pointer-events:none; z-index:10;
       background:repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.08) 2px, rgba(0,0,0,.08) 4px);
     }
@@ -390,73 +396,102 @@
       0%,100% { text-shadow:0 0 12px color-mix(in srgb, var(--green) 40%, transparent); }
       50%     { text-shadow:0 0 22px color-mix(in srgb, var(--green) 75%, transparent); }
     }
-    #circle.variant-terminal .digital-clock {
+    #circle.model-terminal .digital-clock {
       top:34%; left:6%; transform:none; text-align:left; z-index:2;
       font-size:clamp(1.6rem, 8cqmin, 3.4rem); animation:terminal-glow 3s ease-in-out infinite;
     }
-    #circle.variant-terminal .digital-clock.h12 { font-size:clamp(1.3rem, 6.5cqmin, 2.8rem); }
-    #circle.variant-terminal .tz-label {
+    #circle.model-terminal .digital-clock.h12 { font-size:clamp(1.3rem, 6.5cqmin, 2.8rem); }
+    #circle.model-terminal .tz-label {
       top:47%; bottom:auto; left:6%; right:auto; transform:none; text-align:left; max-width:50%; z-index:2;
       color:color-mix(in srgb, var(--green) 60%, #fff); opacity:.85; font-size:clamp(.6rem, 2cqmin, .9rem); letter-spacing:.1em;
     }
-    #circle.variant-terminal .digital-date {
+    #circle.model-terminal .digital-date {
       top:60%; left:6%; transform:none; text-align:left; width:auto; white-space:nowrap; z-index:2;
       font-size:clamp(.7rem, 2.5cqmin, 1.1rem);
     }
-    #circle.variant-terminal .countdown { top:68%; left:6%; transform:none; text-align:left; opacity:.85; z-index:2; font-size:clamp(.65rem, 2.2cqmin, 1rem); }
-    #circle.variant-terminal .countdown::before { content:'→ '; color:var(--amber); }
-    #circle.variant-terminal .precision-clock {
+    #circle.model-terminal .countdown { top:68%; left:6%; transform:none; text-align:left; opacity:.85; z-index:2; font-size:clamp(.65rem, 2.2cqmin, 1rem); }
+    #circle.model-terminal .countdown::before { content:'→ '; color:var(--amber); }
+    #circle.model-terminal .precision-clock {
       bottom:8%; left:6%; transform:none; text-align:left; z-index:2;
       color:color-mix(in srgb, var(--green) 55%, #fff); opacity:.7; font-size:clamp(.55rem, 1.8cqmin, .85rem);
     }
-    #circle.variant-terminal .precision-clock::before { content:'› '; color:var(--amber); }
-    #circle.variant-terminal .signature { bottom:8%; left:auto; right:6%; transform:none; text-align:right; opacity:.4; z-index:2; font-size:clamp(.5rem, 1.4cqmin, .75rem); }
+    #circle.model-terminal .precision-clock::before { content:'› '; color:var(--amber); }
+    #circle.model-terminal .signature { bottom:8%; left:auto; right:6%; transform:none; text-align:right; opacity:.4; z-index:2; font-size:clamp(.5rem, 1.4cqmin, .75rem); }
 
     /* HUD */
-    #circle.variant-hud {
+    #circle.model-hud {
       --ar-w:16; --ar-h:10; --rect-vw:92vw; --rect-max:860px; --radius:12px;
       background:color-mix(in srgb, var(--face-bg) 88%, var(--green) 12%); overflow:hidden;
       border:1px solid color-mix(in srgb, var(--green) 30%, transparent);
       box-shadow:0 0 50px color-mix(in srgb, var(--green) 12%, transparent), inset 0 0 100px color-mix(in srgb, var(--green) 2%, transparent);
     }
-    #circle.variant-hud .digital-clock {
+    #circle.model-hud .digital-clock {
       top:42%; z-index:3; font-size:clamp(1.8rem, 10cqmin, 4rem);
       text-shadow:0 0 20px color-mix(in srgb, var(--green) 60%, transparent);
     }
-    #circle.variant-hud .digital-clock.h12 { font-size:clamp(1.4rem, 8cqmin, 3.2rem); }
-    #circle.variant-hud .countdown { top:60%; z-index:3; opacity:.9; font-size:clamp(.9rem, 4cqmin, 1.6rem); }
-    #circle.variant-hud .digital-date {
+    #circle.model-hud .digital-clock.h12 { font-size:clamp(1.4rem, 8cqmin, 3.2rem); }
+    #circle.model-hud .countdown { top:60%; z-index:3; opacity:.9; font-size:clamp(.9rem, 4cqmin, 1.6rem); }
+    #circle.model-hud .digital-date {
       top:7%; left:4%; transform:none; text-align:left; width:auto; white-space:nowrap; z-index:3;
       color:color-mix(in srgb, var(--green) 70%, #fff); font-size:clamp(.6rem, 2cqmin, .9rem); letter-spacing:.06em;
     }
-    #circle.variant-hud .tz-label {
+    #circle.model-hud .tz-label {
       top:7%; bottom:auto; left:auto; right:4%; transform:none; text-align:right; max-width:40%; z-index:3;
       color:color-mix(in srgb, var(--green) 70%, #fff); opacity:.7; font-size:clamp(.6rem, 2cqmin, .9rem); letter-spacing:.06em;
     }
-    #circle.variant-hud .precision-clock {
+    #circle.model-hud .precision-clock {
       bottom:7%; left:4%; transform:none; text-align:left; z-index:3;
       color:color-mix(in srgb, var(--green) 60%, #fff); opacity:.75; font-size:clamp(.55rem, 1.8cqmin, .85rem);
     }
-    #circle.variant-hud .signature { bottom:7%; left:auto; right:4%; transform:none; text-align:right; opacity:.4; z-index:3; font-size:clamp(.5rem, 1.4cqmin, .75rem); }
+    #circle.model-hud .signature { bottom:7%; left:auto; right:4%; transform:none; text-align:right; opacity:.4; z-index:3; font-size:clamp(.5rem, 1.4cqmin, .75rem); }
 
     /* Sleek */
-    #circle.variant-sleek {
+    #circle.model-sleek {
       --radius:12px;
       background:#0d0d0d; border:1px solid #1f1f1f; box-shadow:0 10px 40px rgba(0,0,0,.5);
       font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
-    #circle.variant-sleek .digital-date {
+    #circle.model-sleek .digital-date {
       top:22%; width:auto; white-space:nowrap;
       color:#7a7f87; font-size:clamp(1rem, 2.8cqmin, 1.4rem); font-weight:500;
       letter-spacing:.15em; text-transform:uppercase;
     }
-    #circle.variant-sleek .digital-clock {
+    #circle.model-sleek .digital-clock {
       top:45%; font-size:clamp(4rem, 22cqmin, 11rem);
       color:#f8fafc; font-weight:300; letter-spacing:-.02em;
     }
-    #circle.variant-sleek .digital-clock.h12 { font-size:clamp(3rem, 18cqmin, 8.5rem); }
-    #circle.variant-sleek .digital-clock .ms { display:inline; color:#64748b; font-size:.6em; font-weight:400; letter-spacing:0; }
-    #circle.variant-sleek .digital-clock .period { color:#94a3b8; font-size:.45em; font-weight:500; margin-left:8px; letter-spacing:.05em; }
+    #circle.model-sleek .digital-clock.h12 { font-size:clamp(3rem, 18cqmin, 8.5rem); }
+    #circle.model-sleek .digital-clock .ms { display:inline; color:#64748b; font-size:.6em; font-weight:400; letter-spacing:0; }
+    #circle.model-sleek .digital-clock .period { color:#94a3b8; font-size:.45em; font-weight:500; margin-left:8px; letter-spacing:.05em; }
+
+    /* Big Display – time fills almost the whole screen, everything else is small */
+    #circle.model-big-display {
+      aspect-ratio:auto; width:98vw; height:calc(100dvh - var(--chrome));
+      border-radius:12px; background:var(--face-bg);
+      border:1px solid color-mix(in srgb, var(--blu) 25%, transparent);
+    }
+    #circle.model-big-display .digital-clock {
+      top:50%; font-size:min(17.5cqw, 55cqh); line-height:1; letter-spacing:0;
+      text-shadow:0 0 30px color-mix(in srgb, var(--blu) 40%, transparent);
+    }
+    #circle.model-big-display .digital-clock.h12 { font-size:min(14.5cqw, 50cqh);color:var(--yell) }
+    #circle.model-big-display .digital-clock .period { font-size:.3em; margin-left:.25em; color: var(--yell) }
+    #circle.model-big-display .digital-date {
+      top:5%; left:3%; transform:none; width:auto; white-space:nowrap; text-align:left;
+      font-size:max(.8rem, min(2.6cqw, 5cqh)); color: var(--blu);
+    }
+    #circle.model-big-display .tz-label {
+      top:5%; bottom:auto; left:auto; right:3%; transform:none; text-align:right; max-width:40%;
+      font-size:max(.7rem, min(2cqw, 4cqh)); opacity:.8; color:var(--yell)
+    }
+    #circle.model-big-display .precision-clock {
+      bottom:4%; left:3%; transform:none; text-align:left;
+      font-size:max(.65rem, min(1.8cqw, 3.5cqh));
+    }
+    #circle.model-big-display .signature {
+      bottom:4%; left:auto; right:3%; transform:none; text-align:right; opacity:.4;
+      font-size:max(.55rem, min(1.2cqw, 2.5cqh)); color: var(--blu);
+    }
 
     /* ── 7. UI: settings & status bar ────────────────────────── */
     .settings-button {
@@ -517,7 +552,7 @@
     @media (max-width:600px) {
       :root { --chrome:88px; --hour-hand-w:4px; --min-hand-w:3px; --sec-hand-w:1.5px; }
       .clock-circle { width:min(96vmin, 96vw, calc(100dvh - var(--chrome))); }
-      #circle:is(.variant-neon, .variant-bars, .variant-terminal, .variant-hud, .variant-sleek) {
+      #circle:is(.model-neon, .model-bars, .model-terminal, .model-hud, .model-sleek) {
         --ar-w:4; --ar-h:3; --rect-vw:94vw; --rect-max:600px;
       }
       .progress-bar-container { height:8px; }
@@ -529,7 +564,7 @@
   </style>
 </head>
 <body>
-  <main class="clock-circle variant-room-control" id="circle" aria-label="MasterClock LED">
+  <main class="clock-circle model-room-control" id="circle" aria-label="MasterClock LED">
     <div class="digital-date" id="digitalDate"></div>
 
     <canvas class="matrix-canvas" id="matrixCanvas" aria-hidden="true"></canvas>
@@ -575,19 +610,20 @@
   <section class="settings-panel" id="settingsPanel" hidden>
     <h2 data-i18n="settings">Settings</h2>
     <div class="setting-row">
-      <label data-i18n="variant">Variant</label>
-      <select id="variantSelect">
-        <option value="room-control" data-i18n="variantRoom">Room Control LED</option>
-        <option value="analog"       data-i18n="variantAnalog">Analog</option>
-        <option value="sleek-analog" data-i18n="variantSleekAnalog">Sleek Analog</option>
-        <option value="sleek"        data-i18n="variantSleek">Sleek</option>
-        <option value="neon"         data-i18n="variantNeon">Neon</option>
-        <option value="bars"         data-i18n="variantBars">Bars</option>
-        <option value="minimal"      data-i18n="variantMinimal">Minimal</option>
-        <option value="modern"       data-i18n="variantModern">Modern</option>
-        <option value="matrix"       data-i18n="variantMatrix">Matrix</option>
-        <option value="terminal"     data-i18n="variantTerminal">Terminal</option>
-        <option value="hud"          data-i18n="variantHud">HUD</option>
+      <label data-i18n="model">Model</label>
+      <select id="modelselect">
+        <option value="room-control" data-i18n="modelRoom">Room Control LED</option>
+        <option value="analog"       data-i18n="modelAnalog">Analog</option>
+        <option value="sleek-analog" data-i18n="modelSleekAnalog">Sleek Analog</option>
+        <option value="sleek"        data-i18n="modelSleek">Sleek</option>
+        <option value="big-display"  data-i18n="modelBigDisplay">Big Display</option>
+        <option value="neon"         data-i18n="modelNeon">Neon</option>
+        <option value="bars"         data-i18n="modelBars">Bars</option>
+        <option value="minimal"      data-i18n="modelMinimal">Minimal</option>
+        <option value="modern"       data-i18n="modelModern">Modern</option>
+        <option value="matrix"       data-i18n="modelMatrix">Matrix</option>
+        <option value="terminal"     data-i18n="modelTerminal">Terminal</option>
+        <option value="hud"          data-i18n="modelHud">HUD</option>
       </select>
     </div>
     <div class="setting-row">
@@ -662,19 +698,20 @@
     const RESYNC_WARN_MS     = 60 * 1000;
     const WAKE_DRIFT_MS      = 250;     // clock drift tolerated after the tab/device wakes up
 
-    const VARIANTS = ['room-control', 'analog', 'minimal', 'modern', 'neon', 'bars', 'matrix', 'terminal', 'hud', 'sleek', 'sleek-analog'];
+    const models = ['room-control', 'analog', 'minimal', 'modern', 'neon', 'bars', 'matrix', 'terminal', 'hud', 'sleek', 'sleek-analog', 'big-display'];
     const THEMES   = ['classic', 'cyan', 'amber', 'mono', 'vaporwave', 'matrix'];
-    const PROGRESS_VARIANTS = new Set(['room-control', 'modern', 'neon']);
-    const ANALOG_VARIANTS   = new Set(['analog', 'sleek-analog']);
+    const PROGRESS_models = new Set(['room-control', 'modern', 'neon']);
+    const ANALOG_models   = new Set(['analog', 'sleek-analog']);
 
    
+
 /* ═══ 2. I18N ═════════════════════════════════════════════
    Missing keys fall back to English (see t()).             */
 const I18N = {
   en: { settings:'Settings', language:'Language', timezone:'Timezone', hourFormat:'Hour format', pulse:'10s pulse', device:'Device',
-        variant:'Variant', variantRoom:'Room Control LED', variantAnalog:'Analog', variantMinimal:'Minimal', variantModern:'Modern',
-        variantNeon:'Neon', variantBars:'Bars', variantMatrix:'Matrix', variantTerminal:'Terminal', variantHud:'HUD',
-        variantSleek:'Sleek', variantSleekAnalog:'Sleek Analog', theme:'Theme',
+        model:'Model', modelBigDisplay:'Big Display', modelRoom:'Room Control LED', modelAnalog:'Analog', modelMinimal:'Minimal', modelModern:'Modern',
+        modelNeon:'Neon', modelBars:'Bars', modelMatrix:'Matrix', modelTerminal:'Terminal', modelHud:'HUD',
+        modelSleek:'Sleek', modelSleekAnalog:'Sleek Analog', theme:'Theme',
         resync:'Resync now',
         searching:'Looking for time source…',
         connecting:'Connecting to time source…',
@@ -686,8 +723,8 @@ const I18N = {
         source:'source', clockAhead:'device clock is', ahead:'ahead', behind:'behind', lastSync:'last sync' },
 
   es: { settings:'Ajustes', language:'Idioma', timezone:'Zona horaria', hourFormat:'Formato hora', pulse:'Pulso 10s', device:'Dispositivo',
-        variant:'Variante', variantAnalog:'Analógico', variantMinimal:'Mínimo', variantModern:'Moderno',
-        variantNeon:'Neón', variantBars:'Barras', variantTerminal:'Terminal', theme:'Tema',
+        model:'Modelo', modelBigDisplay:'Pantalla grande', modelSleek:'Elegante', modelSleekAnalog:'Elegante analógico', modelAnalog:'Analógico', modelMinimal:'Mínimo', modelModern:'Moderno',
+        modelNeon:'Neón', modelBars:'Barras', modelTerminal:'Terminal', theme:'Tema',
         resync:'Resincronizar ahora',
         searching:'Buscando fuente de tiempo…',
         connecting:'Conectando con la fuente de tiempo…',
@@ -699,8 +736,8 @@ const I18N = {
         source:'fuente', clockAhead:'reloj del dispositivo está', ahead:'adelantado', behind:'atrasado', lastSync:'última sinc' },
 
   fr: { settings:'Paramètres', language:'Langue', timezone:'Fuseau horaire', hourFormat:'Format heure', pulse:'Pulsation 10s', device:'Appareil',
-        variant:'Variante', variantAnalog:'Analogique', variantMinimal:'Minimal', variantModern:'Moderne',
-        variantNeon:'Néon', variantBars:'Barres', variantTerminal:'Terminal', theme:'Thème',
+        model:'Modèle', modelBigDisplay:'Grand affichage', modelSleek:'Élégant', modelSleekAnalog:'Élégant analogique', modelAnalog:'Analogique', modelMinimal:'Minimal', modelModern:'Moderne',
+        modelNeon:'Néon', modelBars:'Barres', modelTerminal:'Terminal', theme:'Thème',
         resync:'Resynchroniser',
         searching:'Recherche source de temps…',
         connecting:'Connexion à la source horaire…',
@@ -712,8 +749,8 @@ const I18N = {
         source:'source', clockAhead:'horloge est', ahead:'en avance', behind:'en retard', lastSync:'dernière sync' },
 
   de: { settings:'Einstellungen', language:'Sprache', timezone:'Zeitzone', hourFormat:'Zeitformat', pulse:'Puls 10s', device:'Gerät',
-        variant:'Variante', variantAnalog:'Analog', variantMinimal:'Minimal', variantModern:'Modern',
-        variantBars:'Balken', variantTerminal:'Terminal', theme:'Thema',
+        model:'Modell', modelBigDisplay:'Großanzeige', modelSleek:'Elegant', modelSleekAnalog:'Elegant analog', modelAnalog:'Analog', modelMinimal:'Minimal', modelModern:'Modern',
+        modelBars:'Balken', modelTerminal:'Terminal', theme:'Thema',
         resync:'Jetzt synchronisieren',
         searching:'Zeitquelle wird gesucht…',
         connecting:'Verbindung zur Zeitquelle…',
@@ -725,8 +762,8 @@ const I18N = {
         source:'Quelle', clockAhead:'Geräteuhr ist', ahead:'voraus', behind:'zurück', lastSync:'letzte Sync' },
 
   it: { settings:'Impostazioni', language:'Lingua', timezone:'Fuso orario', hourFormat:'Formato ora', pulse:'Impulso 10s', device:'Dispositivo',
-        variant:'Variante', variantAnalog:'Analogico', variantMinimal:'Minimal', variantModern:'Moderno',
-        variantBars:'Barre', variantTerminal:'Terminale', theme:'Tema',
+        model:'Modello', modelBigDisplay:'Display grande', modelSleek:'Elegante', modelSleekAnalog:'Elegante analogico', modelAnalog:'Analogico', modelMinimal:'Minimal', modelModern:'Moderno',
+        modelBars:'Barre', modelTerminal:'Terminale', theme:'Tema',
         resync:'Risincronizza ora',
         searching:'Ricerca sorgente oraria…',
         connecting:'Connessione alla sorgente oraria…',
@@ -738,9 +775,9 @@ const I18N = {
         source:'sorgente', clockAhead:'orologio è', ahead:'avanti', behind:'indietro', lastSync:'ultima sinc' },
 
   zh: { settings:'设置', language:'语言', timezone:'时区', hourFormat:'时间格式', pulse:'10 秒脉冲', device:'设备',
-        variant:'样式', variantAnalog:'指针', variantMinimal:'极简', variantModern:'现代',
-        variantNeon:'霓虹', variantBars:'条状', variantMatrix:'矩阵', variantTerminal:'终端',
-        variantSleek:'时尚', variantSleekAnalog:'时尚指针', theme:'主题',
+        model:'样式', modelBigDisplay:'大屏', modelAnalog:'指针', modelMinimal:'极简', modelModern:'现代',
+        modelNeon:'霓虹', modelBars:'条状', modelMatrix:'矩阵', modelTerminal:'终端',
+        modelSleek:'时尚', modelSleekAnalog:'时尚指针', theme:'主题',
         resync:'立即重新同步',
         searching:'正在查找时间源…',
         connecting:'正在连接时间源…',
@@ -752,9 +789,9 @@ const I18N = {
         source:'来源', clockAhead:'设备时钟', ahead:'快', behind:'慢', lastSync:'上次同步' },
 
   ru: { settings:'Настройки', language:'Язык', timezone:'Часовой пояс', hourFormat:'Формат времени', pulse:'Импульс 10 с', device:'Устройство',
-        variant:'Вариант', variantAnalog:'Аналоговые', variantMinimal:'Минимальный', variantModern:'Современный',
-        variantNeon:'Неон', variantBars:'Полосы', variantMatrix:'Матрица', variantTerminal:'Терминал',
-        variantSleek:'Стильный', variantSleekAnalog:'Стильные стрелки', theme:'Тема',
+        model:'Модель', modelBigDisplay:'Крупный дисплей', modelAnalog:'Аналоговые', modelMinimal:'Минимальный', modelModern:'Современный',
+        modelNeon:'Неон', modelBars:'Полосы', modelMatrix:'Матрица', modelTerminal:'Терминал',
+        modelSleek:'Стильный', modelSleekAnalog:'Стильные стрелки', theme:'Тема',
         resync:'Синхронизировать сейчас',
         searching:'Поиск источника времени…',
         connecting:'Подключение к источнику времени…',
@@ -766,8 +803,8 @@ const I18N = {
         source:'источник', clockAhead:'часы устройства', ahead:'впереди', behind:'позади', lastSync:'последняя синх' },
 
   pl: { settings:'Ustawienia', language:'Język', timezone:'Strefa czasowa', hourFormat:'Format czasu', pulse:'Puls 10 s', device:'Urządzenie',
-        variant:'Wariant', variantAnalog:'Analogowy', variantMinimal:'Minimalny', variantModern:'Nowoczesny',
-        variantBars:'Słupki', variantTerminal:'Terminal', theme:'Motyw',
+        model:'Model', modelBigDisplay:'Duży wyświetlacz', modelSleek:'Elegancki', modelSleekAnalog:'Elegancki analogowy', modelAnalog:'Analogowy', modelMinimal:'Minimalny', modelModern:'Nowoczesny',
+        modelBars:'Słupki', modelTerminal:'Terminal', theme:'Motyw',
         resync:'Synchronizuj teraz',
         searching:'Szukam źródła czasu…',
         connecting:'Łączenie ze źródłem czasu…',
@@ -779,8 +816,8 @@ const I18N = {
         source:'źródło', clockAhead:'zegar urządzenia jest', ahead:'do przodu', behind:'do tyłu', lastSync:'ostatnia synchronizacja' },
 
   no: { settings:'Innstillinger', language:'Språk', timezone:'Tidssone', hourFormat:'Tidsformat', pulse:'10 s puls', device:'Enhet',
-        variant:'Variant', variantAnalog:'Analogt', variantMinimal:'Minimalistisk', variantModern:'Moderne',
-        variantBars:'Søyler', variantTerminal:'Terminal', theme:'Tema',
+        model:'Modell', modelBigDisplay:'Stor skjerm', modelSleek:'Elegant', modelSleekAnalog:'Elegant analogt', modelAnalog:'Analogt', modelMinimal:'Minimalistisk', modelModern:'Moderne',
+        modelBars:'Søyler', modelTerminal:'Terminal', theme:'Tema',
         resync:'Synkroniser nå',
         searching:'Leter etter tidskilde…',
         connecting:'Kobler til tidskilde…',
@@ -792,8 +829,8 @@ const I18N = {
         source:'kilde', clockAhead:'klokken er', ahead:'foran', behind:'bak', lastSync:'siste synk' },
 
   da: { settings:'Indstillinger', language:'Sprog', timezone:'Tidszone', hourFormat:'Tidsformat', pulse:'10 s puls', device:'Enhed',
-        variant:'Variant', variantAnalog:'Analogt', variantMinimal:'Minimalistisk', variantModern:'Moderne',
-        variantBars:'Søjler', variantTerminal:'Terminal', theme:'Tema',
+        model:'Model', modelBigDisplay:'Stor skærm', modelSleek:'Elegant', modelSleekAnalog:'Elegant analogt', modelAnalog:'Analogt', modelMinimal:'Minimalistisk', modelModern:'Moderne',
+        modelBars:'Søjler', modelTerminal:'Terminal', theme:'Tema',
         resync:'Synkroniser nu',
         searching:'Søger efter tidskilde…',
         connecting:'Opretter forbindelse til tidskilde…',
@@ -805,8 +842,8 @@ const I18N = {
         source:'kilde', clockAhead:'uret er', ahead:'foran', behind:'bagud', lastSync:'sidste synk' },
 
   ro: { settings:'Setări', language:'Limbă', timezone:'Fus orar', hourFormat:'Format oră', pulse:'Pulsație 10s', device:'Dispozitiv',
-        variant:'Variantă', variantAnalog:'Analogic', variantMinimal:'Minimal', variantModern:'Modern',
-        variantBars:'Bare', variantTerminal:'Terminal', variantSleekAnalog:'Sleek Analogic', theme:'Temă',
+        model:'Model', modelBigDisplay:'Afișaj mare', modelAnalog:'Analogic', modelMinimal:'Minimal', modelModern:'Modern',
+        modelBars:'Bare', modelTerminal:'Terminal', modelSleekAnalog:'Sleek Analogic', theme:'Temă',
         resync:'Resincronizează acum',
         searching:'Se caută sursă de timp…',
         connecting:'Conectare la sursa de timp…',
@@ -817,7 +854,8 @@ const I18N = {
         offset:'offset', sources:'surse', precision:'precizie', disagree:'Surse în dezacord',
         source:'sursa', clockAhead:'ceasul PC-ului este', ahead:'înainte', behind:'înapoi', lastSync:'ultima sincronizare' }
 };
-    const LANG_ALIASES = { nb: 'no', nn: 'no' };
+const LANG_ALIASES = { nb: 'no', nn: 'no' };
+
 
     /* ═══ 3. HELPERS ══════════════════════════════════════════ */
     const $ = id => document.getElementById(id);
@@ -857,10 +895,12 @@ const I18N = {
     const barsRow        = $('barsRow');
     const matrixCanvas   = $('matrixCanvas');
     const sleekDetails   = $('sleekDetails');
+    const precisionTime   = $('precisionTime');
+    const precisionPeriod = $('precisionPeriod');
 
     const settingsPanel    = $('settingsPanel');
     const settingsButton   = $('settingsButton');
-    const variantSelect    = $('variantSelect');
+    const modelselect    = $('modelselect');
     const themeSelect      = $('themeSelect');
     const languageSelect   = $('languageSelect');
     const timezoneSelect   = $('timezoneSelect');
@@ -881,9 +921,9 @@ const I18N = {
     let selectedZone = store.get('masterclock-timezone', 'UTC');
     let hourFormat   = store.get('masterclock-hourformat', '24');
     let pulseEnabled = store.get('masterclock-pulse', 'true') !== 'false';
-    let variant      = store.get('masterclock-variant', 'room-control');
+    let model      = store.get('masterclock-model', 'room-control');
     let theme        = store.get('masterclock-theme', 'classic');
-    if (!VARIANTS.includes(variant)) variant = 'room-control';
+    if (!models.includes(model)) model = 'room-control';
     if (!THEMES.includes(theme))     theme   = 'classic';
 
     // Sync
@@ -925,9 +965,9 @@ const I18N = {
       refreshThemeColors();
       invalidate();
     }
-    function applyVariant() {
-      circle.classList.remove(...VARIANTS.map(v => 'variant-' + v));
-      circle.classList.add('variant-' + variant);
+    function applymodel() {
+      circle.classList.remove(...models.map(v => 'model-' + v));
+      circle.classList.add('model-' + model);
       invalidate();
     }
     function applyI18n() {
@@ -1238,16 +1278,16 @@ async function synchronize() {
       countdown.textContent = String((60 - sec) % 60).padStart(2, '0');
       countdown.style.color = clk.color;
       progressFill.style.backgroundColor = clk.color;
-      if (variant === 'modern') circle.style.setProperty('--modern-color', clk.color);
+      if (model === 'modern') circle.style.setProperty('--modern-color', clk.color);
 
       updateIndicators(sec);
     }
 
     function updateIndicators(sec) {
-      if (ANALOG_VARIANTS.has(variant)) {
+      if (ANALOG_models.has(model)) {
         secondLeds.forEach((led, i) => { led.classList.toggle('on', i === sec); led.classList.remove('pulse-last10'); });
         hourLeds.forEach((led, i) => led.classList.toggle('on', i === clk.h12));
-      } else if (variant === 'room-control') {
+      } else if (model === 'room-control') {
         secondLeds.forEach((led, i) => {
           const on = i <= sec;
           led.classList.toggle('on', on);
@@ -1255,7 +1295,7 @@ async function synchronize() {
         });
         const litHours = Math.floor(sec / 5);
         hourLeds.forEach((led, i) => led.classList.toggle('on', i <= litHours));
-      } else if (variant === 'bars') {
+      } else if (model === 'bars') {
         bars.forEach((bar, i) => bar.classList.toggle('on', i <= sec));
       }
     }
@@ -1264,7 +1304,7 @@ async function synchronize() {
       requestAnimationFrame(render);
 
       if (targetOffset === null) {
-        if (variant === 'matrix') drawMatrixRain(themeColors.green);
+        if (model === 'matrix') drawMatrixRain(themeColors.green);
         return;
       }
 
@@ -1277,25 +1317,25 @@ async function synchronize() {
       const msText = String(ms).padStart(3, '0');
       const s      = clk.sec + ms / 1000;
 
-      if (variant === 'sleek') {clkMs.textContent = '.' + msText;
+      if (model === 'sleek') {clkMs.textContent = '.' + msText;
            } else {
           precisionTime.textContent = `${clk.hms}.${msText}`;
           precisionPeriod.textContent = clk.suffix;
         }
 
-      if (PROGRESS_VARIANTS.has(variant)) {
+      if (PROGRESS_models.has(model)) {
         const progress = s / 60;
         progressFill.style.width = `${progress * 100}%`;
-        if (variant === 'modern') circle.style.setProperty('--progress-deg', `${progress * 360}deg`);
+        if (model === 'modern') circle.style.setProperty('--progress-deg', `${progress * 360}deg`);
       }
 
-      if (ANALOG_VARIANTS.has(variant)) {
+      if (ANALOG_models.has(model)) {
         hourHandEl.style.transform   = `rotate(${(clk.h12 + clk.min / 60) * 30}deg)`;
         minuteHandEl.style.transform = `rotate(${(clk.min + s / 60) * 6}deg)`;
         secondHandEl.style.transform = `rotate(${s * 6}deg)`;
       }
 
-      if (variant === 'matrix') {
+      if (model === 'matrix') {
         const flash = pulseEnabled && clk.sec >= 50 && (Math.floor(now / 500) % 2 === 0);
         drawMatrixRain(flash ? themeColors.red : themeColors.green);
       }
@@ -1315,7 +1355,7 @@ async function synchronize() {
     languageSelect.value   = language;
     hourFormatSelect.value = hourFormat;
     pulseToggle.checked    = pulseEnabled;
-    variantSelect.value    = variant;
+    modelselect.value    = model;
     themeSelect.value      = theme;
 
     addLeds(60, 40, 'led', secondLeds);
@@ -1332,7 +1372,7 @@ async function synchronize() {
     }
 
     applyTheme();
-    applyVariant();
+    applymodel();
     rebuildFormatters();
     applyI18n();
 
@@ -1348,10 +1388,10 @@ async function synchronize() {
     });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') setPanel(false); });
 
-    variantSelect.addEventListener('change', () => {
-      variant = variantSelect.value;
-      store.set('masterclock-variant', variant);
-      applyVariant();
+    modelselect.addEventListener('change', () => {
+      model = modelselect.value;
+      store.set('masterclock-model', model);
+      applymodel();
     });
     themeSelect.addEventListener('change', () => {
       theme = themeSelect.value;
