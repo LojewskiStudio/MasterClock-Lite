@@ -758,7 +758,6 @@
       <label data-i18n="language">Language</label>
       <select id="languageSelect">
         <option value="en">English</option>
-        <option value="ro">Română</option>
         <option value="es">Español</option>
         <option value="fr">Français</option>
         <option value="de">Deutsch</option>
@@ -768,6 +767,7 @@
         <option value="da">Dansk</option>
         <option value="ru">Русский</option>
         <option value="zh">中文</option>
+        <option value="ro">Română</option>
       </select>
     </div>
     <div class="setting-row">
@@ -846,19 +846,6 @@
         noSource: 'Time source unavailable', holdover: 'holdover', offset: 'offset', rtt: 'RTT',
         sources: 'sources', precision: 'accuracy', disagree: 'Sources disagree',
         source: 'source', clockAhead: 'device clock is', ahead: 'ahead', behind: 'behind', lastSync: 'last sync'
-      },
-      ro: {
-        settings: 'Setări', language: 'Limbă', timezone: 'Fus orar studio', hourFormat: 'Format oră',
-        pulse: 'Puls tally 10s', device: 'Dispozitiv', model: 'Model', theme: 'Temă',
-        modelRoom: 'Room Control LED', modelWorld: 'Studio + 5 Glob', modelAnalog: 'Analogic',
-        modelSleekAnalog: 'Sleek Analogic', modelSleek: 'Sleek', modelBars: 'Bare', modelBigDisplay: 'Afișaj mare',
-        worldHubs: 'Ceasuri Globale (5 Fusuri)', masterStudio: 'STUDIO PRINCIPAL', sameTz: 'ORA STUDIO',
-        resync: 'Resincronizează acum', searching: 'Căutare sursă de timp…', connecting: 'Conectare la sursa de timp…',
-        receiving: 'Recepție date de timp…', calculating: 'Calculare offset ceas…',
-        syncing: 'Resincronizare…', synced: 'Sincronizat', syncFailed: 'Resincronizare eșuată',
-        noSource: 'Sursă indisponibilă', holdover: 'holdover', offset: 'offset', rtt: 'RTT',
-        sources: 'surse', precision: 'precizie', disagree: 'Surse în dezacord',
-        source: 'sursă', clockAhead: 'ceasul sistemului este', ahead: 'înainte', behind: 'înapoi', lastSync: 'ultima sinc'
       },
       es: {
         settings: 'Ajustes', language: 'Idioma', timezone: 'Zona horaria estudio', hourFormat: 'Formato hora',
@@ -976,7 +963,20 @@
         noSource: '时间源不可用', holdover: '保持模式', offset: '偏移', rtt: 'RTT',
         sources: '来源', precision: '精度', disagree: '来源不一致',
         source: '来源', clockAhead: '系统时钟', ahead: '快', behind: '慢', lastSync: '上次同步'
-      }
+      },
+       ro: {
+        settings: 'Setări', language: 'Limbă', timezone: 'Fus orar studio', hourFormat: 'Format oră',
+        pulse: 'Puls tally 10s', device: 'Dispozitiv', model: 'Model', theme: 'Temă',
+        modelRoom: 'Room Control LED', modelWorld: 'Studio + 5 Glob', modelAnalog: 'Analogic',
+        modelSleekAnalog: 'Sleek Analogic', modelSleek: 'Sleek', modelBars: 'Bare', modelBigDisplay: 'Afișaj mare',
+        worldHubs: 'Ceasuri Globale (5 Fusuri)', masterStudio: 'STUDIO PRINCIPAL', sameTz: 'ORA STUDIO',
+        resync: 'Resincronizează acum', searching: 'Căutare sursă de timp…', connecting: 'Conectare la sursa de timp…',
+        receiving: 'Recepție date de timp…', calculating: 'Calculare offset ceas…',
+        syncing: 'Resincronizare…', synced: 'Sincronizat', syncFailed: 'Resincronizare eșuată',
+        noSource: 'Sursă indisponibilă', holdover: 'holdover', offset: 'offset', rtt: 'RTT',
+        sources: 'surse', precision: 'precizie', disagree: 'Surse în dezacord',
+        source: 'sursă', clockAhead: 'ceasul sistemului este', ahead: 'înainte', behind: 'înapoi', lastSync: 'ultima sinc'
+      },
     };
     const LANG_ALIASES = { nb: 'no', nn: 'no' };
 
@@ -1229,7 +1229,9 @@
       if (!show) return;
 
       const sign = deviceOffsetMs >= 0 ? '+' : '−';
-      offsetMetric.innerHTML = `${t('offset')} <b>${sign}${Math.round(Math.abs(deviceOffsetMs))} ms</b>`;
+      const absOff = Math.abs(deviceOffsetMs);
+      const oq = absOff < 70 ? 'excellent' : absOff < 350 ? 'good' : 'weak';
+      offsetMetric.innerHTML = `${t('offset')} <b class="q-${oq}">${sign}${Math.round(absOff)} ms</b>`;
 
       const pq = lastUnc < 50 ? 'excellent' : lastUnc < 200 ? 'good' : 'weak';
       precMetric.innerHTML = `${t('precision')} <b class="q-${pq}">±${Math.round(lastUnc)} ms</b>`;
