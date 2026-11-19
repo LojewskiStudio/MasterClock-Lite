@@ -241,11 +241,9 @@
       opacity: .45;
       font: 500 clamp(.55rem, 1.4cqmin, .85rem)/1.2 system-ui, -apple-system, sans-serif;
       letter-spacing: 0.08em;
-      /*text-transform: uppercase;*/
     }
 
     /* ── 4. Components ───────────────────────────────────────── */
-    /* Progress bar */
     .progress-bar-container {
       position: absolute;
       z-index: 1;
@@ -266,7 +264,6 @@
       background: var(--green);
     }
 
-    /* LEDs */
     .led, .hour-led {
       position: absolute;
       border-radius: 50%;
@@ -295,7 +292,6 @@
     @keyframes blink-fast { 0%, 49% { opacity: 1; } 50%, 100% { opacity: .28; } }
     .led.on.pulse-last10 { animation: blink-fast 1s infinite steps(1); }
 
-    /* Analog hands */
     .analog-hands { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
     .analog-hand { position: absolute; bottom: 50%; transform-origin: center bottom; border-radius: 999px 999px 2px 2px; }
     .hour-hand {
@@ -315,7 +311,6 @@
       border-radius: 50%; background: var(--red); z-index: 2;
     }
 
-    /* Bars row */
     .bars-row {
       position: absolute;
       left: 5%;
@@ -349,7 +344,6 @@
       background: var(--red);
     }
 
-    /* Sleek status block */
     .sleek-status {
       position: absolute;
       bottom: 10%;
@@ -368,7 +362,6 @@
     }
     .sleek-details span { color: var(--green); font-weight: 500; }
 
-    /* World Hubs Layout (Studio Master + 6 Global Clocks) */
     .world-layout {
       position: absolute;
       inset: 0;
@@ -489,7 +482,6 @@
     #circle.model-sleek .sleek-status { display: flex; }
     #circle.model-world .world-layout { display: flex; }
 
-    /* Hide default single-clock nodes when model-world or analog is active */
     #circle:is(.model-analog, .model-sleek-analog) .digital-clock,
     #circle.model-sleek-analog .digital-date,
     #circle.model-sleek :is(.precision-clock, .tz-label, .signature),
@@ -499,7 +491,6 @@
     #circle.model-sleek ~ .live-status { display: none; }
 
     /* ── 6. Models ───────────────────────────────────────────── */
-    /* Analog */
     #circle.model-analog .led { width: clamp(3px, 1cqmin, 6px); height: clamp(3px, 1cqmin, 6px); background: var(--sec-off); opacity: .75; }
     #circle.model-analog .led.on { background: var(--red); opacity: 1; }
     #circle.model-analog .hour-led { width: clamp(5px, 1.6cqmin, 10px); height: clamp(5px, 1.6cqmin, 10px); background: var(--hour-off); opacity: .85; }
@@ -507,7 +498,6 @@
     #circle.model-analog .digital-date { top: 26%; font-size: clamp(.65rem, 2.8cqmin, 1.3rem); }
     #circle.model-analog .signature { top: 19.5%; bottom: auto; transform: translate(-50%, -50%); opacity: .65; }
 
-    /* Sleek Analog */
     #circle.model-sleek-analog .hour-led {
       width: clamp(3px, .8cqmin, 5px); height: clamp(12px, 3.5cqmin, 18px); border-radius: 1px;
       background: var(--hour-off); opacity: 1; transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
@@ -526,7 +516,6 @@
     #circle.model-sleek-analog .precision-clock { top: 76%; bottom: auto; color: var(--amber); opacity: .9; font-size: clamp(.65rem, 2.3cqmin, 1.15rem); }
     #circle.model-sleek-analog .signature { top: 23%; bottom: auto; transform: translate(-50%, -50%); opacity: .65; }
 
-    /* Bars */
     #circle.model-bars { background: var(--face-bg); }
     #circle.model-bars .digital-clock { top: 41%; font-size: clamp(1.8rem, 13.5cqmin, 5.2rem); }
     #circle.model-bars .digital-clock.h12 { font-size: clamp(1.4rem, 10.5cqmin, 4.1rem); }
@@ -535,7 +524,6 @@
     #circle.model-bars .tz-label { top: 21%; bottom: auto; font-size: clamp(.55rem, 1.8cqmin, .9rem); }
     #circle.model-bars .signature { bottom: 2.5%; }
 
-    /* Sleek */
     #circle.model-sleek {
       --radius: 14px;
       background: var(--face-bg);
@@ -555,7 +543,6 @@
     #circle.model-sleek .digital-clock .ms { display: inline; color: var(--precis); font-size: .52em; font-weight: 400; }
     #circle.model-sleek .digital-clock .period { color: var(--amber); font-size: .4em; font-weight: 500; margin-left: 8px; }
 
-    /* Big Display */
     #circle.model-big-display {
       aspect-ratio: auto;
       width: 98vw;
@@ -718,7 +705,6 @@
 
     <div class="sleek-status"><div class="sleek-details" id="sleekDetails"></div></div>
 
-    <!-- Studio Master + 5 Global Hubs -->
     <div class="world-layout" id="worldLayout">
       <div class="world-master">
         <div class="world-master-header">
@@ -820,15 +806,27 @@
     'use strict';
 
     /* ═══ 1. CONFIG ═══════════════════════════════════════════ */
-    const API_SAMPLES        = 5;
-    const API_SAMPLE_GAP_MS  = 110;
+    const API_SAMPLES        = 3;
+    const API_SAMPLE_GAP_MS  = 120;
     const REQUEST_TIMEOUT_MS = 4000;
-    const HEADER_SAMPLES     = 24;
+    const HEADER_SAMPLES     = 12;
     const GOOD_UNC_MS        = 150;
     const HEADER_MIN_AGREE   = 0.6;
     const RESYNC_OK_MS       = 10 * 60 * 1000;
     const RESYNC_WARN_MS     = 60 * 1000;
+    const MAX_BACKOFF_MS     = 15 * 60 * 1000;
     const WAKE_DRIFT_MS      = 250;
+
+    // Auto-sync cooldown (reload / visibility / timer) vs manual button anti-spam
+    const AUTO_SYNC_COOLDOWN_MS = 60 * 1000;
+    const MANUAL_COOLDOWN_MS    = 5 * 1000;
+    const SYNC_CACHE_MAX_AGE    = 2 * 60 * 1000;
+    const SYNC_LEASE_MS         = 45 * 1000;
+
+    const SYNC_SESSION_KEY = 'masterclock-sync-guard-v3';
+    const SYNC_SHARED_KEY  = 'masterclock-shared-sync-v3';
+    const SYNC_LEASE_KEY   = 'masterclock-sync-lease-v3';
+    const TAB_ID           = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
 
     const MODELS = ['room-control', 'world', 'analog', 'sleek-analog', 'sleek', 'bars', 'big-display'];
     const THEMES = ['classic', 'ebu', 'amber', 'cyan', 'mono'];
@@ -974,7 +972,7 @@
         sources: '来源', precision: '精度', disagree: '来源不一致',
         source: '来源', clockAhead: '系统时钟', ahead: '快', behind: '慢', lastSync: '上次同步'
       },
-       ro: {
+      ro: {
         settings: 'Setări', language: 'Limbă', timezone: 'Fus orar studio', hourFormat: 'Format oră',
         pulse: 'Puls tally 10s', device: 'Dispozitiv', model: 'Model', theme: 'Temă',
         modelRoom: 'Room Control LED', modelWorld: 'Studio + 6 Glob', modelAnalog: 'Analogic',
@@ -1000,6 +998,11 @@
       set(key, value)    { try { localStorage.setItem(key, value); } catch {} }
     };
 
+    const sStore = {
+      get(key, fallback) { try { const v = sessionStorage.getItem(key); return v === null ? fallback : v; } catch { return fallback; } },
+      set(key, value)    { try { sessionStorage.setItem(key, value); } catch {} }
+    };
+
     function detectLanguage() {
       const stored = store.get('masterclock-lang', '');
       if (I18N[stored]) return stored;
@@ -1016,7 +1019,6 @@
         const raw = store.get('masterclock-world-zones', '');
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed) && parsed.length === 6) return parsed;
-        // Migrate existing five-hub settings without losing the user's selections.
         if (Array.isArray(parsed) && parsed.length === 5) return [...parsed, DEFAULT_WORLD_ZONES[5]];
       } catch {}
       return [...DEFAULT_WORLD_ZONES];
@@ -1123,6 +1125,8 @@
     let lastSyncMono   = null;
     let syncing        = false;
     let syncTimer      = 0;
+    let failStreak     = 0;
+    let lastManualWall = 0;
     let syncState      = { kind: '', key: 'searching', extra: '' };
 
     let tz = zone();
@@ -1255,19 +1259,31 @@
       updateSleekDetails();
     }
 
-    /* ═══ 8. TIME SYNC ════════════════════════════════════════ */
+    /* ═══ 8. TIME SYNC & CROSS-TAB COORDINATION ═══════════════ */
     const API_SOURCES = [
       {
         name: 'timeapi.io',
         url: 'https://timeapi.io/api/time/current/zone?timeZone=UTC',
-        parse: j => Date.parse(trunc3(j.dateTime) + 'Z')
+        parse: j => parseStrictTimestamp(j && j.dateTime, true)
       },
       {
         name: 'worldtimeapi.org',
         url: 'https://worldtimeapi.org/api/timezone/Etc/UTC',
-        parse: j => Date.parse(trunc3(j.utc_datetime))
+        parse: j => parseStrictTimestamp(j && j.utc_datetime, false)
       }
     ];
+
+    function parseStrictTimestamp(rawVal, allowMissingTzAsUtc = false) {
+      if (typeof rawVal !== 'string' || !rawVal.trim()) return NaN;
+      let s = trunc3(rawVal.trim());
+      if (allowMissingTzAsUtc && !/[zZ]|[+-]\d{2}:?\d{2}$/.test(s)) {
+        s += 'Z';
+      } else if (!/[zZ]|[+-]\d{2}:?\d{2}$/.test(s)) {
+        return NaN;
+      }
+      const ms = Date.parse(s);
+      return Number.isFinite(ms) ? ms : NaN;
+    }
 
     async function syncApi(src) {
       let best = null;
@@ -1282,8 +1298,12 @@
           const t1 = performance.now();
           const srv = src.parse(j);
           if (!Number.isFinite(srv)) throw new Error('parse');
-          const rtt = t1 - t0;
-          const s = { offset: srv - (t0 + rtt / 2), rttMin: rtt, unc: rtt / 2 + 1 };
+          const rtt = Math.max(0, t1 - t0);
+          // Compare server epoch against monotonic epoch estimate (performance.timeOrigin + t_mid)
+          const midMono = (t0 + t1) / 2;
+          const localEpochMid = performance.timeOrigin + midMono;
+          const offset = srv - localEpochMid;
+          const s = { offset, rttMin: rtt, unc: rtt / 2 + 1 };
           if (!best || s.unc < best.unc) best = s;
         } catch {}
         finally { clearTimeout(to); }
@@ -1294,6 +1314,122 @@
     }
 
     const canUseHeaderFallback = () => location.protocol === 'http:' || location.protocol === 'https:';
+
+    function readJson(storageObj, key) {
+      try {
+        const raw = storageObj.get(key, '');
+        return raw ? JSON.parse(raw) : null;
+      } catch {
+        return null;
+      }
+    }
+
+    function writeJson(storageObj, key, val) {
+      storageObj.set(key, JSON.stringify(val));
+    }
+
+    function readSyncState() {
+      const local = readJson(sStore, SYNC_SESSION_KEY);
+      const shared = readJson(store, SYNC_SHARED_KEY);
+      if (!local && !shared) return null;
+      if (!local) return shared;
+      if (!shared) return local;
+      const localTs = Math.max(local.savedWall || 0, local.lastAttemptWall || 0);
+      const sharedTs = Math.max(shared.savedWall || 0, shared.lastAttemptWall || 0);
+      return sharedTs >= localTs ? shared : local;
+    }
+
+    function saveSyncSnapshot(patch) {
+      const prev = readSyncState() || { v: 3 };
+      const next = { ...prev, ...patch, v: 3 };
+      writeJson(sStore, SYNC_SESSION_KEY, next);
+      writeJson(store, SYNC_SHARED_KEY, next);
+      return next;
+    }
+
+    function applySnapshot(snap, holdoverLabel = false) {
+      if (!snap || !Number.isFinite(snap.anchorEpoch) || !Number.isFinite(snap.savedWall)) return false;
+      const elapsed = Date.now() - snap.savedWall;
+      if (elapsed < 0 || elapsed > SYNC_CACHE_MAX_AGE) return false;
+
+      const estimatedEpochNow = snap.anchorEpoch + elapsed;
+      const nowMono = performance.now();
+
+      targetOffset   = estimatedEpochNow - nowMono;
+      lastSyncMono   = nowMono - elapsed;
+      lastRtt        = Number.isFinite(snap.rtt) ? snap.rtt : null;
+      lastUnc        = snap.unc;
+      deviceOffsetMs = estimatedEpochNow - Date.now();
+
+      const source = snap.source || 'cached reference';
+      if (holdoverLabel) {
+        setSync('warn', 'synced', `${source} · ${t('holdover')}`);
+      } else if (snap.agree === false) {
+        setSync('warn', 'disagree', source);
+      } else {
+        setSync(snap.unc < GOOD_UNC_MS ? 'ok' : 'warn', 'synced', source);
+      }
+      updateMetrics();
+      invalidate();
+      return true;
+    }
+
+    function getAutoCooldownRemaining() {
+      const snap = readSyncState();
+      if (!snap) return 0;
+      const lastWall = Math.max(
+        Number.isFinite(snap.lastAttemptWall) ? snap.lastAttemptWall : 0,
+        Number.isFinite(snap.savedWall) ? snap.savedWall : 0
+      );
+      if (!lastWall) return 0;
+      const elapsed = Date.now() - lastWall;
+      if (elapsed < 0) return AUTO_SYNC_COOLDOWN_MS;
+      return Math.max(0, AUTO_SYNC_COOLDOWN_MS - elapsed);
+    }
+
+    function getActiveLeaseRemaining() {
+      const lease = readJson(store, SYNC_LEASE_KEY);
+      if (!lease || !Number.isFinite(lease.until)) return 0;
+      const rem = lease.until - Date.now();
+      return rem > 0 ? Math.min(rem, SYNC_LEASE_MS) : 0;
+    }
+
+    let leaseRenewTimer = 0;
+
+    function renewSyncLease() {
+      const lease = readJson(store, SYNC_LEASE_KEY);
+      if (lease && lease.owner === TAB_ID) {
+        writeJson(store, SYNC_LEASE_KEY, { owner: TAB_ID, until: Date.now() + SYNC_LEASE_MS });
+      }
+    }
+
+    function startLeaseRenewal() {
+      stopLeaseRenewal();
+      const interval = Math.max(4000, Math.floor(SYNC_LEASE_MS / 3));
+      leaseRenewTimer = setInterval(renewSyncLease, interval);
+    }
+
+    function stopLeaseRenewal() {
+      if (leaseRenewTimer) {
+        clearInterval(leaseRenewTimer);
+        leaseRenewTimer = 0;
+      }
+    }
+
+    function acquireSyncLease() {
+      if (getActiveLeaseRemaining() > 0) return false;
+      writeJson(store, SYNC_LEASE_KEY, { owner: TAB_ID, until: Date.now() + SYNC_LEASE_MS });
+      const confirm = readJson(store, SYNC_LEASE_KEY);
+      return Boolean(confirm && confirm.owner === TAB_ID);
+    }
+
+    function releaseSyncLease() {
+      stopLeaseRenewal();
+      const lease = readJson(store, SYNC_LEASE_KEY);
+      if (lease && lease.owner === TAB_ID) {
+        try { localStorage.removeItem(SYNC_LEASE_KEY); } catch {}
+      }
+    }
 
     function marzullo(intervals) {
       const ev = [];
@@ -1312,10 +1448,12 @@
       let method = 'HEAD';
       const base = location.href.split('#')[0].split('?')[0];
       for (let i = 0; i < HEADER_SAMPLES; i++) {
+        const ctl = new AbortController();
+        const to = setTimeout(() => ctl.abort(), REQUEST_TIMEOUT_MS);
         try {
           const url = `${base}?_=${Math.random().toString(36).slice(2)}`;
           const sendMono = performance.now();
-          const r = await fetch(url, { method, cache: 'no-store' });
+          const r = await fetch(url, { method, cache: 'no-store', signal: ctl.signal });
           const recvMono = performance.now();
           if (!r.ok) {
             if (method === 'HEAD') { method = 'GET'; continue; }
@@ -1325,9 +1463,14 @@
           const age = parseInt(r.headers.get('Age') || '0', 10);
           if (d && !age) {
             const D = Date.parse(d);
-            if (Number.isFinite(D)) iv.push([D - recvMono, D + 1000 - sendMono]);
+            if (Number.isFinite(D)) {
+              const lo = D - performance.timeOrigin - recvMono;
+              const hi = D + 1000 - performance.timeOrigin - sendMono;
+              iv.push([lo, hi]);
+            }
           }
         } catch {}
+        finally { clearTimeout(to); }
         await sleep(120 + Math.random() * 40);
       }
       if (iv.length < 3) throw new Error('no Date header');
@@ -1336,68 +1479,133 @@
       return { offset: (m.lo + m.hi) / 2, rttMin: null, unc: (m.hi - m.lo) / 2 + 1 };
     }
 
-    function scheduleNextSync() {
-      clearTimeout(syncTimer);
-      syncTimer = setTimeout(synchronize, syncState.kind === 'ok' ? RESYNC_OK_MS : RESYNC_WARN_MS);
+    function getPersistedFailStreak() {
+      const snap = readSyncState();
+      return snap && Number.isFinite(snap.failStreak) ? Math.max(0, Math.min(8, snap.failStreak)) : failStreak;
     }
 
-    async function synchronize() {
+    function computeRetryDelay() {
+      const streak = Math.max(failStreak, getPersistedFailStreak());
+      if (streak === 0) return syncState.kind === 'ok' ? RESYNC_OK_MS : RESYNC_WARN_MS;
+      const exp = Math.min(MAX_BACKOFF_MS, RESYNC_WARN_MS * Math.pow(2, streak - 1));
+      const jitter = Math.floor(Math.random() * 5000);
+      return exp + jitter;
+    }
+
+    function scheduleNextSync(customDelayMs = null) {
+      clearTimeout(syncTimer);
+      const delay = customDelayMs !== null ? customDelayMs : computeRetryDelay();
+      syncTimer = setTimeout(() => synchronize({ manual: false }), Math.max(500, delay));
+    }
+
+    async function synchronize({ manual = false } = {}) {
       if (syncing) return;
+
+      if (manual) {
+        const sinceManual = Date.now() - lastManualWall;
+        if (lastManualWall > 0 && sinceManual >= 0 && sinceManual < MANUAL_COOLDOWN_MS) return;
+        lastManualWall = Date.now();
+      } else {
+        const cooldown = getAutoCooldownRemaining();
+        if (cooldown > 0) {
+          if (targetOffset === null) applySnapshot(readSyncState(), true);
+          scheduleNextSync(cooldown);
+          return;
+        }
+      }
+
+      if (!acquireSyncLease()) {
+        const waitMs = Math.min(getActiveLeaseRemaining() || 5000, SYNC_LEASE_MS);
+        const startSharedWall = readSyncState()?.savedWall || 0;
+        const deadline = Date.now() + waitMs;
+
+        while (Date.now() < deadline && getActiveLeaseRemaining() > 0) {
+          await sleep(600);
+          const latest = readSyncState();
+          if (latest && (latest.savedWall || 0) > startSharedWall && applySnapshot(latest, false)) {
+            failStreak = 0;
+            scheduleNextSync();
+            return;
+          }
+        }
+
+        const latest = readSyncState();
+        if (latest && applySnapshot(latest, targetOffset === null)) {
+          failStreak = 0;
+          scheduleNextSync();
+        } else {
+          const remCooldown = getAutoCooldownRemaining();
+          scheduleNextSync(remCooldown > 0 ? remCooldown : 2000 + Math.floor(Math.random() * 1500));
+        }
+        return;
+      }
+
       syncing = true;
       resyncButton.disabled = true;
+      startLeaseRenewal();
+      const attemptWall = Date.now();
+      saveSyncSnapshot({ lastAttemptWall: attemptWall });
       setSync('busy', 'connecting');
 
-      const results = [];
-      for (const src of API_SOURCES) {
-        setSync('busy', 'receiving', src.name);
-        try {
-          results.push(Object.assign(await syncApi(src), { name: src.name }));
-        } catch {}
-      }
-
-      let res = null, label = '', agree = null;
-
-      if (results.length) {
-        setSync('busy', 'calculating');
-        results.sort((a, b) => a.unc - b.unc);
-        res = results[0];
-        label = res.name;
-
-        if (results.length > 1) {
-          agree = results.slice(1).every(b => Math.abs(res.offset - b.offset) <= res.unc + b.unc);
-          if (agree) label = `${results.length} ${t('sources')}`;
+      try {
+        const results = [];
+        for (const src of API_SOURCES) {
+          setSync('busy', 'receiving', src.name);
+          try {
+            results.push(Object.assign(await syncApi(src), { name: src.name }));
+          } catch {}
         }
-      } else if (canUseHeaderFallback()) {
-        setSync('busy', 'receiving', 'HTTP Date');
-        try {
-          res = await syncDateHeader();
-          label = 'HTTP Date';
-        } catch {}
+
+        let res = null, label = '', agree = null;
+
+        if (results.length) {
+          setSync('busy', 'calculating');
+          results.sort((a, b) => a.unc - b.unc);
+          res = results[0];
+          label = res.name;
+
+          if (results.length > 1) {
+            agree = results.slice(1).every(b => Math.abs(res.offset - b.offset) <= res.unc + b.unc);
+            if (agree) label = `${results.length} ${t('sources')}`;
+          }
+        } else if (canUseHeaderFallback()) {
+          setSync('busy', 'receiving', 'HTTP Date');
+          try {
+            res = await syncDateHeader();
+            label = 'HTTP Date';
+          } catch {}
+        }
+
+        if (res) {
+          failStreak = 0;
+          const now = performance.now();
+          const savedWall = Date.now();
+          const snap = saveSyncSnapshot({
+            lastAttemptWall: attemptWall,
+            savedWall,
+            anchorEpoch: performance.timeOrigin + now + res.offset,
+            rtt: res.rttMin,
+            unc: res.unc,
+            source: label,
+            agree,
+            failStreak: 0
+          });
+          applySnapshot(snap, false);
+        } else {
+          failStreak = Math.min(8, Math.max(failStreak, getPersistedFailStreak()) + 1);
+          saveSyncSnapshot({ lastAttemptWall: Date.now(), failStreak });
+          setSync(
+            targetOffset === null ? 'bad' : 'warn',
+            targetOffset === null ? 'noSource' : 'syncFailed',
+            targetOffset === null ? '' : t('holdover')
+          );
+        }
+      } finally {
+        releaseSyncLease();
+        scheduleNextSync();
+        syncing = false;
+        resyncButton.disabled = false;
       }
-
-      if (res) {
-        const now = performance.now();
-        targetOffset   = res.offset;
-        lastRtt        = res.rttMin;
-        lastUnc        = res.unc;
-        lastSyncMono   = now;
-        deviceOffsetMs = (now + res.offset) - Date.now();
-
-        if (agree === false) setSync('warn', 'disagree', label);
-        else setSync(res.unc < GOOD_UNC_MS ? 'ok' : 'warn', 'synced', label);
-
-        updateMetrics();
-      } else {
-        setSync(
-          targetOffset === null ? 'bad' : 'warn',
-          targetOffset === null ? 'noSource' : 'syncFailed',
-          targetOffset === null ? '' : t('holdover')
-        );
-      }
-
-      scheduleNextSync();
-      syncing = false;
-      resyncButton.disabled = false;
     }
 
     /* ═══ 9. DOM BUILD (LEDs, Bars, World Cards) ══════════════ */
@@ -1561,7 +1769,6 @@
     }
     if (selectedZone !== 'UTC' && selectedZone !== 'DEVICE' && !zones.includes(selectedZone)) selectedZone = 'UTC';
 
-    // Populate 6 World Hub selectors in Settings
     for (let i = 0; i < 6; i++) {
       const row = document.createElement('div');
       row.className = 'setting-row';
@@ -1662,16 +1869,31 @@
       store.set('masterclock-pulse', String(pulseEnabled));
       invalidate();
     });
-    resyncButton.addEventListener('click', () => synchronize());
+    resyncButton.addEventListener('click', () => synchronize({ manual: true }));
+
+    window.addEventListener('storage', e => {
+      if (e.key === SYNC_SHARED_KEY && !syncing) {
+        const snap = readSyncState();
+        if (snap && applySnapshot(snap, false)) {
+          failStreak = 0;
+          scheduleNextSync();
+        }
+      }
+    });
+
+    window.addEventListener('pagehide', () => releaseSyncLease());
 
     document.addEventListener('visibilitychange', () => {
       if (document.hidden || targetOffset === null || syncing) return;
       const drift = (performance.now() + targetOffset) - Date.now() - deviceOffsetMs;
-      if (Math.abs(drift) > WAKE_DRIFT_MS) synchronize();
+      if (Math.abs(drift) > WAKE_DRIFT_MS) synchronize({ manual: false });
     });
 
+    const initialSnap = readSyncState();
+    if (initialSnap && Number.isFinite(initialSnap.failStreak)) failStreak = initialSnap.failStreak;
+    applySnapshot(initialSnap, true);
     render();
-    synchronize();
+    synchronize({ manual: false });
   </script>
 </body>
 </html>
