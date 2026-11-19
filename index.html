@@ -713,7 +713,7 @@
     <div class="world-layout" id="worldLayout">
       <div class="world-master">
         <div class="world-master-header">
-          <span class="world-tally-badge" id="worldMasterBadge">MasterClock</span>
+          <span class="world-tally-badge" id="worldMasterBadge">MASTER STUDIO</span>
           <span id="worldMasterZone">UTC</span>
         </div>
         <div class="world-master-time">
@@ -832,156 +832,153 @@
       'Asia/Tokyo'
     ];
 
-   
-/* ═══ 2. I18N ═════════════════════════════════════════════ */
-const I18N = {
-  en: {
-    settings: 'Settings', language: 'Language', timezone: 'Studio Timezone', hourFormat: 'Hour format',
-    pulse: '10s tally pulse', device: 'Device', model: 'Model', theme: 'Theme',
-    modelRoom: 'Room Control LED', modelWorld: 'Studio + 5 World', modelAnalog: 'Analog',
-    modelSleekAnalog: 'Sleek Analog', modelSleek: 'Sleek', modelBars: 'Bars', modelBigDisplay: 'Big Display',
-    worldHubs: 'World Clocks (5 Hubs)', masterClock: 'MasterClock', sameTz: 'STUDIO TZ',
-    resync: 'Resync now', searching: 'Looking for time source…', connecting: 'Connecting to time source…',
-    receiving: 'Receiving time data…', calculating: 'Calculating clock offset…',
-    syncing: 'Resyncing…', synced: 'Locked', syncFailed: 'Resync failed',
-    noSource: 'Time source unavailable', holdover: 'holdover', offset: 'offset', rtt: 'RTT',
-    sources: 'sources', precision: 'accuracy', disagree: 'Sources disagree',
-    source: 'source', clockAhead: 'device clock is', ahead: 'ahead', behind: 'behind', lastSync: 'last sync'
-  },
-  es: {
-    settings: 'Ajustes', language: 'Idioma', timezone: 'Zona horaria estudio', hourFormat: 'Formato hora',
-    pulse: 'Pulso tally 10s', device: 'Dispositivo', model: 'Modelo', theme: 'Tema',
-    modelRoom: 'Room Control LED', modelWorld: 'Estudio + 5 Mundial', modelAnalog: 'Analógico',
-    modelSleekAnalog: 'Elegante analógico', modelSleek: 'Elegante', modelBars: 'Barras', modelBigDisplay: 'Pantalla grande',
-    worldHubs: 'Relojes Mundiales (5 Zonas)', masterClock: 'MasterClock', sameTz: 'HORA ESTUDIO',
-    resync: 'Resincronizar ahora', searching: 'Buscando fuente de tiempo…', connecting: 'Conectando con fuente…',
-    receiving: 'Recibiendo datos…', calculating: 'Calculando desfase…',
-    syncing: 'Resincronizando…', synced: 'Sincronizado', syncFailed: 'Fallo al resincronizar',
-    noSource: 'Fuente no disponible', holdover: 'holdover', offset: 'desfase', rtt: 'RTT',
-    sources: 'fuentes', precision: 'precisión', disagree: 'Fuentes en desacuerdo',
-    source: 'fuente', clockAhead: 'reloj del sistema está', ahead: 'adelantado', behind: 'atrasado', lastSync: 'última sinc'
-  },
-  fr: {
-    settings: 'Paramètres', language: 'Langue', timezone: 'Fuseau studio', hourFormat: 'Format heure',
-    pulse: 'Pulsation tally 10s', device: 'Appareil', model: 'Modèle', theme: 'Thème',
-    modelRoom: 'Room Control LED', modelWorld: 'Studio + 5 Monde', modelAnalog: 'Analogique',
-    modelSleekAnalog: 'Élégant analogique', modelSleek: 'Élégant', modelBars: 'Barres', modelBigDisplay: 'Grand affichage',
-    worldHubs: 'Horloges Mondiales (5)', masterClock: 'MasterClock', sameTz: 'HEURE STUDIO',
-    resync: 'Resynchroniser', searching: 'Recherche source…', connecting: 'Connexion…',
-    receiving: 'Réception des données…', calculating: 'Calcul de l’écart…',
-    syncing: 'Resynchronisation…', synced: 'Verrouillé', syncFailed: 'Échec resync',
-    noSource: 'Source indisponible', holdover: 'holdover', offset: 'décalage', rtt: 'RTT',
-    sources: 'sources', precision: 'précision', disagree: 'Sources en désaccord',
-    source: 'source', clockAhead: 'horloge système est', ahead: 'en avance', behind: 'en retard', lastSync: 'dernière sync'
-  },
-  de: {
-    settings: 'Einstellungen', language: 'Sprache', timezone: 'Studio-Zeitzone', hourFormat: 'Zeitformat',
-    pulse: '10s Tally-Puls', device: 'Gerät', model: 'Modell', theme: 'Thema',
-    modelRoom: 'Room Control LED', modelWorld: 'Studio + 5 Weltzeit', modelAnalog: 'Analog',
-    modelSleekAnalog: 'Elegant analog', modelSleek: 'Elegant', modelBars: 'Balken', modelBigDisplay: 'Großanzeige',
-    worldHubs: 'Weltuhren (5 Zonen)', masterClock: 'MasterClock', sameTz: 'STUDIOZEIT',
-    resync: 'Jetzt synchronisieren', searching: 'Zeitquelle suchen…', connecting: 'Verbinden…',
-    receiving: 'Zeitdaten empfangen…', calculating: 'Offset berechnen…',
-    syncing: 'Synchronisiere…', synced: 'Synchronisiert', syncFailed: 'Sync fehlgeschlagen',
-    noSource: 'Quelle nicht verfügbar', holdover: 'Holdover', offset: 'Offset', rtt: 'RTT',
-    sources: 'Quellen', precision: 'Genauigkeit', disagree: 'Quellen weichen ab',
-    source: 'Quelle', clockAhead: 'Systemuhr ist', ahead: 'voraus', behind: 'zurück', lastSync: 'letzte Sync'
-  },
-  it: {
-    settings: 'Impostazioni', language: 'Lingua', timezone: 'Fuso orario studio', hourFormat: 'Formato ora',
-    pulse: 'Impulso tally 10s', device: 'Dispositivo', model: 'Modello', theme: 'Tema',
-    modelRoom: 'Room Control LED', modelWorld: 'Studio + 5 Mondo', modelAnalog: 'Analogico',
-    modelSleekAnalog: 'Elegante analogico', modelSleek: 'Elegante', modelBars: 'Barre', modelBigDisplay: 'Display grande',
-    worldHubs: 'Orologi Mondiali (5)', masterClock: 'MasterClock', sameTz: 'ORA STUDIO',
-    resync: 'Risincronizza ora', searching: 'Ricerca sorgente…', connecting: 'Connessione…',
-    receiving: 'Ricezione dati…', calculating: 'Calcolo scarto…',
-    syncing: 'Risincronizzazione…', synced: 'Sincronizzato', syncFailed: 'Errore sync',
-    noSource: 'Sorgente non disponibile', holdover: 'holdover', offset: 'offset', rtt: 'RTT',
-    sources: 'sorgenti', precision: 'precisione', disagree: 'Sorgenti discordanti',
-    source: 'sorgente', clockAhead: 'orologio di sistema è', ahead: 'avanti', behind: 'indietro', lastSync: 'ultima sinc'
-  },
-  pl: {
-    settings: 'Ustawienia', language: 'Język', timezone: 'Strefa studia', hourFormat: 'Format czasu',
-    pulse: 'Puls tally 10s', device: 'Urządzenie', model: 'Model', theme: 'Motyw',
-    modelRoom: 'Room Control LED', modelWorld: 'Studio + 5 Świat', modelAnalog: 'Analogowy',
-    modelSleekAnalog: 'Elegancki analogowy', modelSleek: 'Elegancki', modelBars: 'Słupki', modelBigDisplay: 'Duży wyświetlacz',
-    worldHubs: 'Zegary Światowe (5)', masterClock: 'MasterClock', sameTz: 'CZAS STUDIA',
-    resync: 'Synchronizuj teraz', searching: 'Szukam źródła…', connecting: 'Łączenie…',
-    receiving: 'Odbieranie danych…', calculating: 'Obliczanie przesunięcia…',
-    syncing: 'Synchronizacja…', synced: 'Zsynchronizowano', syncFailed: 'Błąd synchronizacji',
-    noSource: 'Źródło niedostępne', holdover: 'holdover', offset: 'przesunięcie', rtt: 'RTT',
-    sources: 'źródeł', precision: 'dokładność', disagree: 'Źródła niezgodne',
-    source: 'źródło', clockAhead: 'zegar urządzenia jest', ahead: 'do przodu', behind: 'do tyłu', lastSync: 'ostatnia sync'
-  },
-  no: {
-    settings: 'Innstillinger', language: 'Språk', timezone: 'Studiotidssone', hourFormat: 'Tidsformat',
-    pulse: '10s tally-puls', device: 'Enhet', model: 'Modell', theme: 'Tema',
-    modelRoom: 'Room Control LED', modelWorld: 'Studio + 5 Verden', modelAnalog: 'Analogt',
-    modelSleekAnalog: 'Elegant analogt', modelSleek: 'Elegant', modelBars: 'Søyler', modelBigDisplay: 'Stor skjerm',
-    worldHubs: 'Verdensklokker (5)', masterClock: 'MasterClock', sameTz: 'STUDIOTID',
-    resync: 'Synkroniser nå', searching: 'Leter etter tidskilde…', connecting: 'Kobler til…',
-    receiving: 'Mottar tidsdata…', calculating: 'Beregner avvik…',
-    syncing: 'Synkroniserer…', synced: 'Synkronisert', syncFailed: 'Synkronisering mislyktes',
-    noSource: 'Tidskilde utilgjengelig', holdover: 'holdover', offset: 'forskyvning', rtt: 'RTT',
-    sources: 'kilder', precision: 'nøyaktighet', disagree: 'Kilder er uenige',
-    source: 'kilde', clockAhead: 'klokken er', ahead: 'foran', behind: 'bak', lastSync: 'siste synk'
-  },
-  da: {
-    settings: 'Indstillinger', language: 'Sprog', timezone: 'Studietidszone', hourFormat: 'Tidsformat',
-    pulse: '10s tally-puls', device: 'Enhed', model: 'Model', theme: 'Tema',
-    modelRoom: 'Room Control LED', modelWorld: 'Studie + 5 Verden', modelAnalog: 'Analogt',
-    modelSleekAnalog: 'Elegant analogt', modelSleek: 'Elegant', modelBars: 'Søjler', modelBigDisplay: 'Stor skærm',
-    worldHubs: 'Verdensure (5)', masterClock: 'MasterClock', sameTz: 'STUDIETID',
-    resync: 'Synkroniser nu', searching: 'Søger efter tidskilde…', connecting: 'Forbinder…',
-    receiving: 'Modtager tidsdata…', calculating: 'Beregner afvigelse…',
-    syncing: 'Synkroniserer…', synced: 'Synkroniseret', syncFailed: 'Synkronisering mislykkedes',
-    noSource: 'Tidskilde utilgængelig', holdover: 'holdover', offset: 'forskydning', rtt: 'RTT',
-    sources: 'kilder', precision: 'nøjagtighed', disagree: 'Kilder er uenige',
-    source: 'kilde', clockAhead: 'uret er', ahead: 'foran', behind: 'bagud', lastSync: 'sidste synk'
-  },
-  ru: {
-    settings: 'Настройки', language: 'Язык', timezone: 'Часовой пояс студии', hourFormat: 'Формат времени',
-    pulse: 'Импульс tally 10с', device: 'Устройство', model: 'Модель', theme: 'Тема',
-    modelRoom: 'Room Control LED', modelWorld: 'Студия + 5 Мировых', modelAnalog: 'Аналоговые',
-    modelSleekAnalog: 'Стильные стрелки', modelSleek: 'Стильный', modelBars: 'Полосы', modelBigDisplay: 'Крупный дисплей',
-    worldHubs: 'Мировое время (5 зон)', masterClock: 'МастерКлок', sameTz: 'ВРЕМЯ СТУДИИ',
-    resync: 'Синхронизировать сейчас', searching: 'Поиск источника…', connecting: 'Подключение…',
-    receiving: 'Получение данных…', calculating: 'Расчёт смещения…',
-    syncing: 'Синхронизация…', synced: 'Синхронизировано', syncFailed: 'Ошибка синхронизации',
-    noSource: 'Источник недоступен', holdover: 'holdover', offset: 'смещение', rtt: 'RTT',
-    sources: 'источников', precision: 'точность', disagree: 'Источники расходятся',
-    source: 'источник', clockAhead: 'часы системы', ahead: 'впереди', behind: 'позади', lastSync: 'последняя синх'
-  },
-  zh: {
-    settings: '设置', language: '语言', timezone: '演播室时区', hourFormat: '时间格式',
-    pulse: '10秒提示脉冲', device: '设备', model: '样式', theme: '主题',
-    modelRoom: 'Room Control LED', modelWorld: '演播室 + 5世界时钟', modelAnalog: '指针',
-    modelSleekAnalog: '时尚指针', modelSleek: '时尚', modelBars: '条状', modelBigDisplay: '大屏',
-    worldHubs: '世界时钟 (5个地区)', masterClock: '主时钟', sameTz: '同演播室',
-    resync: '立即重新同步', searching: '查找时间源…', connecting: '连接时间源…',
-    receiving: '接收时间数据…', calculating: '计算时钟偏差…',
-    syncing: '重新同步中…', synced: '已锁定', syncFailed: '同步失败',
-    noSource: '时间源不可用', holdover: '保持模式', offset: '偏移', rtt: 'RTT',
-    sources: '来源', precision: '精度', disagree: '来源不一致',
-    source: '来源', clockAhead: '系统时钟', ahead: '快', behind: '慢', lastSync: '上次同步'
-  },
-  ro: {
-    settings: 'Setări', language: 'Limbă', timezone: 'Fus orar studio', hourFormat: 'Format oră',
-    pulse: 'Puls tally 10s', device: 'Dispozitiv', model: 'Model', theme: 'Temă',
-    modelRoom: 'Room Control LED', modelWorld: 'Studio + 5 Glob', modelAnalog: 'Analogic',
-    modelSleekAnalog: 'Sleek Analogic', modelSleek: 'Sleek', modelBars: 'Bare', modelBigDisplay: 'Afișaj mare',
-    worldHubs: 'Ceasuri Globale (5 Fusuri)', masterClock: 'MasterClock', sameTz: 'ORA STUDIO',
-    resync: 'Resincronizează acum', searching: 'Căutare sursă de timp…', connecting: 'Conectare la sursa de timp…',
-    receiving: 'Recepție date de timp…', calculating: 'Calculare offset ceas…',
-    syncing: 'Resincronizare…', synced: 'Sincronizat', syncFailed: 'Resincronizare eșuată',
-    noSource: 'Sursă indisponibilă', holdover: 'holdover', offset: 'offset', rtt: 'RTT',
-    sources: 'surse', precision: 'precizie', disagree: 'Surse în dezacord',
-    source: 'sursă', clockAhead: 'ceasul sistemului este', ahead: 'înainte', behind: 'înapoi', lastSync: 'ultima sinc'
-  },
-};
-
-const LANG_ALIASES = { nb: 'no', nn: 'no' };
-
+    /* ═══ 2. I18N ═════════════════════════════════════════════ */
+    const I18N = {
+      en: {
+        settings: 'Settings', language: 'Language', timezone: 'Studio Timezone', hourFormat: 'Hour format',
+        pulse: '10s tally pulse', device: 'Device', model: 'Model', theme: 'Theme',
+        modelRoom: 'Room Control LED', modelWorld: 'Studio + 5 World', modelAnalog: 'Analog',
+        modelSleekAnalog: 'Sleek Analog', modelSleek: 'Sleek', modelBars: 'Bars', modelBigDisplay: 'Big Display',
+        worldHubs: 'World Clocks (5 Hubs)', masterStudio: 'MASTER STUDIO', sameTz: 'STUDIO TZ',
+        resync: 'Resync now', searching: 'Looking for time source…', connecting: 'Connecting to time source…',
+        receiving: 'Receiving time data…', calculating: 'Calculating clock offset…',
+        syncing: 'Resyncing…', synced: 'Locked', syncFailed: 'Resync failed',
+        noSource: 'Time source unavailable', holdover: 'holdover', offset: 'offset', rtt: 'RTT',
+        sources: 'sources', precision: 'accuracy', disagree: 'Sources disagree',
+        source: 'source', clockAhead: 'device clock is', ahead: 'ahead', behind: 'behind', lastSync: 'last sync'
+      },
+      es: {
+        settings: 'Ajustes', language: 'Idioma', timezone: 'Zona horaria estudio', hourFormat: 'Formato hora',
+        pulse: 'Pulso tally 10s', device: 'Dispositivo', model: 'Modelo', theme: 'Tema',
+        modelRoom: 'Room Control LED', modelWorld: 'Estudio + 5 Mundial', modelAnalog: 'Analógico',
+        modelSleekAnalog: 'Elegante analógico', modelSleek: 'Elegante', modelBars: 'Barras', modelBigDisplay: 'Pantalla grande',
+        worldHubs: 'Relojes Mundiales (5 Zonas)', masterStudio: 'ESTUDIO PRINCIPAL', sameTz: 'HORA ESTUDIO',
+        resync: 'Resincronizar ahora', searching: 'Buscando fuente de tiempo…', connecting: 'Conectando con fuente…',
+        receiving: 'Recibiendo datos…', calculating: 'Calculando desfase…',
+        syncing: 'Resincronizando…', synced: 'Sincronizado', syncFailed: 'Fallo al resincronizar',
+        noSource: 'Fuente no disponible', holdover: 'holdover', offset: 'desfase', rtt: 'RTT',
+        sources: 'fuentes', precision: 'precisión', disagree: 'Fuentes en desacuerdo',
+        source: 'fuente', clockAhead: 'reloj del sistema está', ahead: 'adelantado', behind: 'atrasado', lastSync: 'última sinc'
+      },
+      fr: {
+        settings: 'Paramètres', language: 'Langue', timezone: 'Fuseau studio', hourFormat: 'Format heure',
+        pulse: 'Pulsation tally 10s', device: 'Appareil', model: 'Modèle', theme: 'Thème',
+        modelRoom: 'Room Control LED', modelWorld: 'Studio + 5 Monde', modelAnalog: 'Analogique',
+        modelSleekAnalog: 'Élégant analogique', modelSleek: 'Élégant', modelBars: 'Barres', modelBigDisplay: 'Grand affichage',
+        worldHubs: 'Horloges Mondiales (5)', masterStudio: 'STUDIO PRINCIPAL', sameTz: 'HEURE STUDIO',
+        resync: 'Resynchroniser', searching: 'Recherche source…', connecting: 'Connexion…',
+        receiving: 'Réception des données…', calculating: 'Calcul de l’écart…',
+        syncing: 'Resynchronisation…', synced: 'Verrouillé', syncFailed: 'Échec resync',
+        noSource: 'Source indisponible', holdover: 'holdover', offset: 'décalage', rtt: 'RTT',
+        sources: 'sources', precision: 'précision', disagree: 'Sources en désaccord',
+        source: 'source', clockAhead: 'horloge système est', ahead: 'en avance', behind: 'en retard', lastSync: 'dernière sync'
+      },
+      de: {
+        settings: 'Einstellungen', language: 'Sprache', timezone: 'Studio-Zeitzone', hourFormat: 'Zeitformat',
+        pulse: '10s Tally-Puls', device: 'Gerät', model: 'Modell', theme: 'Thema',
+        modelRoom: 'Room Control LED', modelWorld: 'Studio + 5 Weltzeit', modelAnalog: 'Analog',
+        modelSleekAnalog: 'Elegant analog', modelSleek: 'Elegant', modelBars: 'Balken', modelBigDisplay: 'Großanzeige',
+        worldHubs: 'Weltuhren (5 Zonen)', masterStudio: 'HAUPTSTUDIO', sameTz: 'STUDIOZEIT',
+        resync: 'Jetzt synchronisieren', searching: 'Zeitquelle suchen…', connecting: 'Verbinden…',
+        receiving: 'Zeitdaten empfangen…', calculating: 'Offset berechnen…',
+        syncing: 'Synchronisiere…', synced: 'Synchronisiert', syncFailed: 'Sync fehlgeschlagen',
+        noSource: 'Quelle nicht verfügbar', holdover: 'Holdover', offset: 'Offset', rtt: 'RTT',
+        sources: 'Quellen', precision: 'Genauigkeit', disagree: 'Quellen weichen ab',
+        source: 'Quelle', clockAhead: 'Systemuhr ist', ahead: 'voraus', behind: 'zurück', lastSync: 'letzte Sync'
+      },
+      it: {
+        settings: 'Impostazioni', language: 'Lingua', timezone: 'Fuso orario studio', hourFormat: 'Formato ora',
+        pulse: 'Impulso tally 10s', device: 'Dispositivo', model: 'Modello', theme: 'Tema',
+        modelRoom: 'Room Control LED', modelWorld: 'Studio + 5 Mondo', modelAnalog: 'Analogico',
+        modelSleekAnalog: 'Elegante analogico', modelSleek: 'Elegante', modelBars: 'Barre', modelBigDisplay: 'Display grande',
+        worldHubs: 'Orologi Mondiali (5)', masterStudio: 'STUDIO PRINCIPALE', sameTz: 'ORA STUDIO',
+        resync: 'Risincronizza ora', searching: 'Ricerca sorgente…', connecting: 'Connessione…',
+        receiving: 'Ricezione dati…', calculating: 'Calcolo scarto…',
+        syncing: 'Risincronizzazione…', synced: 'Sincronizzato', syncFailed: 'Errore sync',
+        noSource: 'Sorgente non disponibile', holdover: 'holdover', offset: 'offset', rtt: 'RTT',
+        sources: 'sorgenti', precision: 'precisione', disagree: 'Sorgenti discordanti',
+        source: 'sorgente', clockAhead: 'orologio di sistema è', ahead: 'avanti', behind: 'indietro', lastSync: 'ultima sinc'
+      },
+      pl: {
+        settings: 'Ustawienia', language: 'Język', timezone: 'Strefa studia', hourFormat: 'Format czasu',
+        pulse: 'Puls tally 10s', device: 'Urządzenie', model: 'Model', theme: 'Motyw',
+        modelRoom: 'Room Control LED', modelWorld: 'Studio + 5 Świat', modelAnalog: 'Analogowy',
+        modelSleekAnalog: 'Elegancki analogowy', modelSleek: 'Elegancki', modelBars: 'Słupki', modelBigDisplay: 'Duży wyświetlacz',
+        worldHubs: 'Zegary Światowe (5)', masterStudio: 'STUDIO GŁÓWNE', sameTz: 'CZAS STUDIA',
+        resync: 'Synchronizuj teraz', searching: 'Szukam źródła…', connecting: 'Łączenie…',
+        receiving: 'Odbieranie danych…', calculating: 'Obliczanie przesunięcia…',
+        syncing: 'Synchronizacja…', synced: 'Zsynchronizowano', syncFailed: 'Błąd synchronizacji',
+        noSource: 'Źródło niedostępne', holdover: 'holdover', offset: 'przesunięcie', rtt: 'RTT',
+        sources: 'źródeł', precision: 'dokładność', disagree: 'Źródła niezgodne',
+        source: 'źródło', clockAhead: 'zegar urządzenia jest', ahead: 'do przodu', behind: 'do tyłu', lastSync: 'ostatnia sync'
+      },
+      no: {
+        settings: 'Innstillinger', language: 'Språk', timezone: 'Studiotidssone', hourFormat: 'Tidsformat',
+        pulse: '10s tally-puls', device: 'Enhet', model: 'Modell', theme: 'Tema',
+        modelRoom: 'Room Control LED', modelWorld: 'Studio + 5 Verden', modelAnalog: 'Analogt',
+        modelSleekAnalog: 'Elegant analogt', modelSleek: 'Elegant', modelBars: 'Søyler', modelBigDisplay: 'Stor skjerm',
+        worldHubs: 'Verdensklokker (5)', masterStudio: 'HOVEDSTUDIO', sameTz: 'STUDIOTID',
+        resync: 'Synkroniser nå', searching: 'Leter etter tidskilde…', connecting: 'Kobler til…',
+        receiving: 'Mottar tidsdata…', calculating: 'Beregner avvik…',
+        syncing: 'Synkroniserer…', synced: 'Synkronisert', syncFailed: 'Synkronisering mislyktes',
+        noSource: 'Tidskilde utilgjengelig', holdover: 'holdover', offset: 'forskyvning', rtt: 'RTT',
+        sources: 'kilder', precision: 'nøyaktighet', disagree: 'Kilder er uenige',
+        source: 'kilde', clockAhead: 'klokken er', ahead: 'foran', behind: 'bak', lastSync: 'siste synk'
+      },
+      da: {
+        settings: 'Indstillinger', language: 'Sprog', timezone: 'Studietidszone', hourFormat: 'Tidsformat',
+        pulse: '10s tally-puls', device: 'Enhed', model: 'Model', theme: 'Tema',
+        modelRoom: 'Room Control LED', modelWorld: 'Studie + 5 Verden', modelAnalog: 'Analogt',
+        modelSleekAnalog: 'Elegant analogt', modelSleek: 'Elegant', modelBars: 'Søjler', modelBigDisplay: 'Stor skærm',
+        worldHubs: 'Verdensure (5)', masterStudio: 'HOVEDSTUDIE', sameTz: 'STUDIETID',
+        resync: 'Synkroniser nu', searching: 'Søger efter tidskilde…', connecting: 'Forbinder…',
+        receiving: 'Modtager tidsdata…', calculating: 'Beregner afvigelse…',
+        syncing: 'Synkroniserer…', synced: 'Synkroniseret', syncFailed: 'Synkronisering mislykkedes',
+        noSource: 'Tidskilde utilgængelig', holdover: 'holdover', offset: 'forskydning', rtt: 'RTT',
+        sources: 'kilder', precision: 'nøjagtighed', disagree: 'Kilder er uenige',
+        source: 'kilde', clockAhead: 'uret er', ahead: 'foran', behind: 'bagud', lastSync: 'sidste synk'
+      },
+      ru: {
+        settings: 'Настройки', language: 'Язык', timezone: 'Часовой пояс студии', hourFormat: 'Формат времени',
+        pulse: 'Импульс tally 10с', device: 'Устройство', model: 'Модель', theme: 'Тема',
+        modelRoom: 'Room Control LED', modelWorld: 'Студия + 5 Мировых', modelAnalog: 'Аналоговые',
+        modelSleekAnalog: 'Стильные стрелки', modelSleek: 'Стильный', modelBars: 'Полосы', modelBigDisplay: 'Крупный дисплей',
+        worldHubs: 'Мировое время (5 зон)', masterStudio: 'ГЛАВНАЯ СТУДИЯ', sameTz: 'ВРЕМЯ СТУДИИ',
+        resync: 'Синхронизировать сейчас', searching: 'Поиск источника…', connecting: 'Подключение…',
+        receiving: 'Получение данных…', calculating: 'Расчёт смещения…',
+        syncing: 'Синхронизация…', synced: 'Синхронизировано', syncFailed: 'Ошибка синхронизации',
+        noSource: 'Источник недоступен', holdover: 'holdover', offset: 'смещение', rtt: 'RTT',
+        sources: 'источников', precision: 'точность', disagree: 'Источники расходятся',
+        source: 'источник', clockAhead: 'часы системы', ahead: 'впереди', behind: 'позади', lastSync: 'последняя синх'
+      },
+      zh: {
+        settings: '设置', language: '语言', timezone: '演播室时区', hourFormat: '时间格式',
+        pulse: '10秒提示脉冲', device: '设备', model: '样式', theme: '主题',
+        modelRoom: 'Room Control LED', modelWorld: '演播室 + 5世界时钟', modelAnalog: '指针',
+        modelSleekAnalog: '时尚指针', modelSleek: '时尚', modelBars: '条状', modelBigDisplay: '大屏',
+        worldHubs: '世界时钟 (5个地区)', masterStudio: '主演播室', sameTz: '同演播室',
+        resync: '立即重新同步', searching: '查找时间源…', connecting: '连接时间源…',
+        receiving: '接收时间数据…', calculating: '计算时钟偏差…',
+        syncing: '重新同步中…', synced: '已锁定', syncFailed: '同步失败',
+        noSource: '时间源不可用', holdover: '保持模式', offset: '偏移', rtt: 'RTT',
+        sources: '来源', precision: '精度', disagree: '来源不一致',
+        source: '来源', clockAhead: '系统时钟', ahead: '快', behind: '慢', lastSync: '上次同步'
+      },
+       ro: {
+        settings: 'Setări', language: 'Limbă', timezone: 'Fus orar studio', hourFormat: 'Format oră',
+        pulse: 'Puls tally 10s', device: 'Dispozitiv', model: 'Model', theme: 'Temă',
+        modelRoom: 'Room Control LED', modelWorld: 'Studio + 5 Glob', modelAnalog: 'Analogic',
+        modelSleekAnalog: 'Sleek Analogic', modelSleek: 'Sleek', modelBars: 'Bare', modelBigDisplay: 'Afișaj mare',
+        worldHubs: 'Ceasuri Globale (5 Fusuri)', masterStudio: 'STUDIO PRINCIPAL', sameTz: 'ORA STUDIO',
+        resync: 'Resincronizează acum', searching: 'Căutare sursă de timp…', connecting: 'Conectare la sursa de timp…',
+        receiving: 'Recepție date de timp…', calculating: 'Calculare offset ceas…',
+        syncing: 'Resincronizare…', synced: 'Sincronizat', syncFailed: 'Resincronizare eșuată',
+        noSource: 'Sursă indisponibilă', holdover: 'holdover', offset: 'offset', rtt: 'RTT',
+        sources: 'surse', precision: 'precizie', disagree: 'Surse în dezacord',
+        source: 'sursă', clockAhead: 'ceasul sistemului este', ahead: 'înainte', behind: 'înapoi', lastSync: 'ultima sinc'
+      },
+    };
+    const LANG_ALIASES = { nb: 'no', nn: 'no' };
 
     /* ═══ 3. HELPERS ══════════════════════════════════════════ */
     const $ = id => document.getElementById(id);
@@ -1159,7 +1156,7 @@ const LANG_ALIASES = { nb: 'no', nn: 'no' };
       document.documentElement.lang = language;
       document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
       settingsButton.setAttribute('aria-label', t('settings'));
-      worldMasterBadge.textContent = t('masterClock');
+      worldMasterBadge.textContent = t('masterStudio');
       updateStatusDisplay();
       updateMetrics();
     }
