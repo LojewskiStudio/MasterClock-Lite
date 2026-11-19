@@ -1,588 +1,694 @@
 <!DOCTYPE html>
-<!--MASTERCLOCK (Lite)
-     Mihai Lucian Lojewski (nov. 2026)
-     Copyright (c) 2026 Lojewski Studio
-     SPDX-License-Identifier: MIT
+<!--MASTERCLOCK Broadcast Edition
+    Mihai Lucian Lojewski (nov. 2026)
+    Copyright (c) 2026 Lojewski Studio
+    SPDX-License-Identifier: MIT
 -->
 <html lang="en" data-theme="classic">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#000000">
-  <title>MasterClock LED</title>
+  <meta name="theme-color" content="#050607">
+  <title>MasterClock Broadcast</title>
   <style>
     /* ═══════════════════════════════════════════════════════════
        INDEX
-       1. Tokens & themes
-       2. Base layout
-       3. Shared text elements
-       4. Components (LEDs, hands, bars, progress)
-       5. Visibility map  ← which element is shown in which model
-       6. Models        ← one block per model
-       7. UI (settings, status bar)
+       1. Tokens & Broadcast Themes
+       2. Base Layout
+       3. Shared Text Elements
+       4. Components (LEDs, Hands, Bars, World Grid)
+       5. Visibility Map
+       6. Models
+       7. UI (Settings & Status Bar)
        8. Responsive
        ═══════════════════════════════════════════════════════════ */
 
-    /* ── 1. Tokens & themes ──────────────────────────────────── */
+    /* ── 1. Tokens & Broadcast Themes ────────────────────────── */
     :root {
-      --chrome: 96px;                       /* vertical space kept free for the status bar */
-      --hour-hand-w: 6px; --min-hand-w: 4px; --sec-hand-w: 2px;
-      /* rectangular models (neon, bars, terminal, hud, sleek) */
-      --ar-w: 16; --ar-h: 9; --rect-vw: 94vw; --rect-max: 900px; --radius: 16px;
+      --chrome: 92px;
+      --hour-hand-w: 6px;
+      --min-hand-w: 4px;
+      --sec-hand-w: 2px;
+      --ar-w: 16;
+      --ar-h: 9;
+      --rect-vw: 94vw;
+      --rect-max: 1040px;
+      --radius: 14px;
+      --border-subtle: rgba(255, 255, 255, 0.08);
     }
+
+    /* 1. Broadcast Classic (Phosphor Green / Amber / Tally Red) */
     :root, html[data-theme="classic"] {
-      --green:#0FFF50; --amber:#ff9100; --red:#ff3131; --precis:#b3b3b3;
-      --hour-on:#00d83a; --hour-off:#14521c; --sec-off:#5d1111;
-      --yell:#fcffcd; --blu:#39fff5;
-      --face-bg:#000000f3; --page-bg:#000;
+      --green: #0edf46;
+      --amber: #ff9100;
+      --red: #ff0000;
+      --precis: #a8a7a7;
+      --tz: #0197c5;
+      --sig: #ff96c2;
+      --hour-on: #0FFF50;
+      --hour-off: #0f3d25;
+      --sec-off: #4b0611;
+      --accent-soft: #00ff843b;
+      --face-bg: #080a09;
+      --card-bg: #0d110f;
+      --page-bg: #030404;
     }
-    html[data-theme="cyan"] {
-      --green:#00e5ff; --amber:#2979ff; --red:#ff2d78;
-      --hour-on:#0091ea; --hour-off:#0d3a44; --sec-off:#4a0e22;
-      --yell:#ffd769; --blu:#fff239;
-      --face-bg:#000d14; --page-bg:#00060a;
+
+    /* 2. EBU / Tally Studio (Deep Slate + Broadcast Emerald & Tally Red) */
+    html[data-theme="ebu"] {
+      --green: #2ceaa3;
+      --amber: #f59e0b;
+      --red: #ef4444;
+      --precis: #8b9bb4;
+      --tz: #40cc99;
+      --sig: #b9e4d4;
+      --hour-on: #10b981;
+      --hour-off: #194139;
+      --sec-off: #571015;
+      --accent-soft: #2ceaa43f;
+      --face-bg: #0b0f14;
+      --card-bg: #111720;
+      --page-bg: #06090d;
     }
+
+    /* 3. Playout Amber (Low-glare Control Room Amber) */
     html[data-theme="amber"] {
-      --green:#ffb300; --amber:#ff6d00; --red:#ff1744;
-      --hour-on:#ff8f00; --hour-off:#3d2b00; --sec-off:#5d1015;
-       --yell:#f1ff26; --blu:#ff8839;
-      --face-bg:#0a0800; --page-bg:#060500;
+      --green: #ffb300;
+      --amber: #ff6d00;
+      --red: #ff2a2a;
+      --precis: #a89984;
+      --tz: #faa66e;
+      --sig: #f8ff96;
+      --hour-on: #ff9100;
+      --hour-off: #382400;
+      --sec-off: #471212;
+      --accent-soft: rgba(255, 179, 0, 0.13);
+      --face-bg: #0c0905;
+      --card-bg: #140f08;
+      --page-bg: #050402;
     }
+
+    /* 4. Telemetry Cyan (Routing / Sync / NTP Rack Blue) */
+    html[data-theme="cyan"] {
+      --green: #38bdf8;
+      --amber: #fbbf24;
+      --red: #f43f5e;
+      --precis: #94a3b8;
+      --hour-on: #0284c7;
+      --hour-off: #0c354d;
+      --sec-off: #451220;
+      --accent-soft: rgba(56, 189, 248, 0.13);
+      --face-bg: #070d14;
+      --card-bg: #0c1521;
+      --page-bg: #03070c;
+    }
+
+    /* 5. Studio Mono (Neutral Reference White + Tally Red) */
     html[data-theme="mono"] {
-      --green:#f0f0f0; --amber:#999999; --red:#ffffff;
-      --hour-on:#cccccc; --hour-off:#262626; --sec-off:#262626;
-       --yell:#ffffff; --blu:#c7c7c7;
-      --face-bg:#0a0a0a; --page-bg:#000;
-    }
-    html[data-theme="vaporwave"] {
-      --green:#ff2d95; --amber:#c200ff; --red:#00e0ff;
-      --hour-on:#b829a8; --hour-off:#3d0a26; --sec-off:#0d3540;
-       --yell:#ffcde8; --blu:#ff3995;
-      --face-bg:#0a0014; --page-bg:#050008;
-    }
-    html[data-theme="matrix"] {
-      --green:#00ff41; --amber:#00a82b; --red:#ff0000;
-      --hour-on:#00d633; --hour-off:#06210b; --sec-off:#4d0000;
-       --yell:#00ff0d; --blu:#39ff43;
-      --face-bg:#000800; --page-bg:#000300;
+      --green: #f1f5f9;
+      --amber: #94a3b8;
+      --red: #ff2e4c;
+      --precis: #64748b;
+      --tz: #e0e0e0;
+      --sig: #bdbdbd;
+      --hour-on: #cbd5e1;
+      --hour-off: #1e293b;
+      --sec-off: #3b1219;
+      --accent-soft: rgba(241, 245, 249, 0.10);
+      --face-bg: #0a0a0c;
+      --card-bg: #121316;
+      --page-bg: #040405;
     }
 
-    /* ── 2. Base layout ──────────────────────────────────────── */
+    /* ── 2. Base Layout ──────────────────────────────────────── */
     * { box-sizing: border-box; }
-    html, body { width:100%; height:100%; margin:0; }
+    html, body { width: 100%; height: 100%; margin: 0; }
     body {
-      min-height:100vh; min-height:100dvh; overflow:hidden;
-      display:grid; place-items:center;
-      background:var(--page-bg); color:#ddd; font-family:monospace;
-      transition:background .3s;
-    }
-    .clock-circle {
-      position:relative; aspect-ratio:1; container-type:size;
-      width:min(88vmin, 750px, calc(100dvh - var(--chrome)));
-      border-radius:50%; background:var(--face-bg); box-shadow:0 0 40px #030303;
-      transition:border-radius .25s, width .25s, aspect-ratio .25s;
-    }
-    /* Shared geometry of the rectangular models */
-    #circle:is(.model-neon, .model-bars, .model-terminal, .model-hud, .model-sleek) {
-      aspect-ratio:var(--ar-w) / var(--ar-h);
-      width:min(var(--rect-vw), calc((100dvh - var(--chrome)) * var(--ar-w) / var(--ar-h)), var(--rect-max));
-      border-radius:var(--radius);
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow: hidden;
+      display: grid;
+      place-items: center;
+      background: var(--page-bg);
+      color: #e2e8f0;
+      font-family: ui-monospace, 'SF Mono', 'JetBrains Mono', 'Consolas', monospace;
+      transition: background .25s ease;
     }
 
-    /* ── 3. Shared text elements ─────────────────────────────── */
-    .digital-clock, .digital-date, .countdown, .signature, .precision-clock, .tz-label {
-      position:absolute; left:50%; transform:translate(-50%,-50%);
-      text-align:center; white-space:nowrap;
+    .clock-circle {
+      position: relative;
+      aspect-ratio: 1;
+      container-type: size;
+      width: min(88vmin, 760px, calc(100dvh - var(--chrome)));
+      border-radius: 50%;
+      background: var(--face-bg);
+      border: 1px solid var(--border-subtle);
+      box-shadow: 0 12px 48px rgba(0, 0, 0, 0.75);
+      transition: border-radius .2s, width .2s, aspect-ratio .2s, background .25s;
     }
+
+    /* Frameless round clocks: no circle background, no border, no circle shadow */
+    #circle:is(.model-room-control, .model-analog, .model-sleek-analog) {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+    }
+
+    /* Rectangular broadcast models */
+    #circle:is(.model-bars, .model-sleek, .model-world) {
+      aspect-ratio: var(--ar-w) / var(--ar-h);
+      width: min(var(--rect-vw), calc((100dvh - var(--chrome)) * var(--ar-w) / var(--ar-h)), var(--rect-max));
+      border-radius: var(--radius);
+    }
+
+    /* ── 3. Shared Text Elements ─────────────────────────────── */
+    .digital-clock, .digital-date, .countdown, .signature, .precision-clock, .tz-label {
+      position: absolute;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      text-align: center;
+      white-space: nowrap;
+    }
+
     .digital-clock {
-      top:46%; font-size:clamp(1.4rem, 13.6cqmin, 6.5rem); font-weight:400;
-      color:var(--green); -webkit-text-stroke:min(1.8px,.05em) #1b1b1b;
-      font-variant-numeric:tabular-nums;
+      top: 46%;
+      font-size: clamp(1.4rem, 13.6cqmin, 6.5rem);
+      font-weight: 500;
+      color: var(--green);
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
     }
     .period {
-      font-size: clamp(0.7rem, 6.8cqmin, 3.25rem);font-weight: 200;
-      color: var(--green);-webkit-text-stroke: min(1.8px, .05em) #1b1b1b;
+      font-size: clamp(0.7rem, 5.5cqmin, 2.8rem);
+      font-weight: 400;
+      color: var(--green);
+      margin-left: 0.2em;
       font-variant-numeric: tabular-nums;
     }
-    .precision-period {font-size: clamp(0.4rem, 1.25cqmin, 0.75rem); font-weight: 400; margin-left: 0.25em;vertical-align: baseline;}
-    .digital-clock.h12 { font-size:clamp(1.1rem, 10.8cqmin, 5.2rem); }
-    .digital-clock .ms { display:none; }
+    .precision-period {
+      font-size: clamp(0.45rem, 1.3cqmin, 0.75rem);
+      font-weight: 400;
+      margin-left: 0.25em;
+    }
+    .digital-clock.h12 { font-size: clamp(1.1rem, 10.6cqmin, 5.1rem); }
+    .digital-clock .ms { display: none; }
+
     .digital-date {
-      z-index:2; top:35%; width:90%; white-space:normal;
-      font-size:clamp(.6rem, 4.55cqmin, 2.2rem); font-weight:400;
-      color:var(--amber); -webkit-text-stroke:min(1px,.03em) #000;
+      z-index: 2;
+      top: 34.5%;
+      width: 90%;
+      white-space: normal;
+      font-size: clamp(.6rem, 4.1cqmin, 1.9rem);
+      font-weight: 400;
+      color: var(--amber);
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
     }
+
     .countdown {
-      top:65%; font-size:clamp(1.2rem, 7.7cqmin, 3.8rem); font-weight:400;
-      color:var(--amber); -webkit-text-stroke:min(.8px,.03em) #000;
-      font-variant-numeric:tabular-nums;
+      top: 65%;
+      font-size: clamp(1.2rem, 7.6cqmin, 3.7rem);
+      font-weight: 500;
+      color: var(--amber);
+      font-variant-numeric: tabular-nums;
     }
+
     .precision-clock {
-      bottom:17%; transform:translate(-50%,50%);
-      color:var(--precis); opacity:.75; font-size:clamp(.65rem,2.5cqmin,1.5rem);
-      font-variant-numeric:tabular-nums;
+      bottom: 18%;
+      transform: translate(-50%, 50%);
+      color: var(--precis);
+      opacity: .8;
+      font-size: clamp(.65rem, 2.3cqmin, 1.35rem);
+      font-variant-numeric: tabular-nums;
     }
+
     .tz-label {
-      bottom:20%; transform:translate(-50%,50%); max-width:70%;
-      overflow:hidden; text-overflow:ellipsis;
-      color:var(--green); opacity:.7; font-size:clamp(.5rem,2.1cqmin,1rem); letter-spacing:.04em;
+      bottom: 21%;
+      transform: translate(-50%, 50%);
+      max-width: 72%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      color: var(--tz);
+      opacity: .70;
+      font-size: clamp(.5rem, 2cqmin, .95rem);
+      letter-spacing: .08em;
     }
+
     .signature {
-      bottom:14%; transform:translate(-50%,50%);
-      color:var(--green); opacity:.55; font:clamp(.6rem,1.5cqmin,1rem)/1.2 system-ui,sans-serif;
+      bottom: 15%;
+      transform: translate(-50%, 50%);
+      color: var(--sig);
+      opacity: .45;
+      font: 500 clamp(.55rem, 1.4cqmin, .85rem)/1.2 system-ui, -apple-system, sans-serif;
+      letter-spacing: 0.08em;
+      /*text-transform: uppercase;*/
     }
 
     /* ── 4. Components ───────────────────────────────────────── */
     /* Progress bar */
     .progress-bar-container {
-      position:absolute; z-index:1; top:55%; left:50%; transform:translateX(-50%);
-      width:70%; height:10px; border:1px solid #333; border-radius:5px;
-      overflow:hidden; background:#222;
+      position: absolute;
+      z-index: 1;
+      top: 55.5%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 68%;
+      height: 8px;
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      border-radius: 4px;
+      overflow: hidden;
+      background: rgba(255, 255, 255, 0.04);
     }
-    .progress-bar-fill { width:0; height:100%; border-radius:10px 0 0 10px; background:var(--green); }
+    .progress-bar-fill {
+      width: 0;
+      height: 100%;
+      border-radius: 3px 0 0 3px;
+      background: var(--green);
+    }
 
     /* LEDs */
-    .led, .hour-led { position:absolute; border-radius:50%; transform:translate(-50%,-50%); }
-    .led      { width:clamp(5px,2cqmin,20px);   height:clamp(5px,2cqmin,20px);   background:var(--sec-off);  transition:background .15s; }
-    .hour-led { width:clamp(8px,2.5cqmin,30px); height:clamp(8px,2.5cqmin,30px); background:var(--hour-off); transition:background .15s; }
-    .led.on      { background:var(--red); }
-    .hour-led.on { background:var(--hour-on); }
-    @keyframes blink-fast { 0%,49% { opacity:1; } 50%,100% { opacity:.3; } }
-    .led.on.pulse-last10 { animation:blink-fast 1s infinite steps(1); }
+    .led, .hour-led {
+      position: absolute;
+      border-radius: 50%;
+      transform: translate(-50%, -50%);
+    }
+    .led {
+      width: clamp(5px, 1.9cqmin, 18px);
+      height: clamp(5px, 1.9cqmin, 18px);
+      background: var(--sec-off);
+      transition: background .12s;
+    }
+    .hour-led {
+      width: clamp(8px, 2.4cqmin, 26px);
+      height: clamp(8px, 2.4cqmin, 26px);
+      background: var(--hour-off);
+      transition: background .12s;
+    }
+    .led.on {
+      background: var(--red);
+      box-shadow: 0 0 8px color-mix(in srgb, var(--red) 65%, transparent);
+    }
+    .hour-led.on {
+      background: var(--hour-on);
+      box-shadow: 0 0 8px color-mix(in srgb, var(--hour-on) 55%, transparent);
+    }
+    @keyframes blink-fast { 0%, 49% { opacity: 1; } 50%, 100% { opacity: .28; } }
+    .led.on.pulse-last10 { animation: blink-fast 1s infinite steps(1); }
 
     /* Analog hands */
-    .analog-hands { position:absolute; inset:0; pointer-events:none; z-index:1; }
-    .analog-hand { position:absolute; bottom:50%; transform-origin:center bottom; border-radius:999px 999px 2px 2px; }
-    .hour-hand   { width:var(--hour-hand-w); height:24%; left:calc(50% - var(--hour-hand-w) / 2); background:var(--green); box-shadow:0 0 8px color-mix(in srgb, var(--green) 40%, transparent); }
-    .minute-hand { width:var(--min-hand-w);  height:32%; left:calc(50% - var(--min-hand-w) / 2);  background:var(--green); box-shadow:0 0 8px color-mix(in srgb, var(--green) 40%, transparent); }
-    .second-hand { width:var(--sec-hand-w);  height:40%; left:calc(50% - var(--sec-hand-w) / 2);  background:var(--red);   box-shadow:0 0 10px color-mix(in srgb, var(--red) 60%, transparent); }
+    .analog-hands { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+    .analog-hand { position: absolute; bottom: 50%; transform-origin: center bottom; border-radius: 999px 999px 2px 2px; }
+    .hour-hand {
+      width: var(--hour-hand-w); height: 24%; left: calc(50% - var(--hour-hand-w) / 2);
+      background: var(--green);
+    }
+    .minute-hand {
+      width: var(--min-hand-w); height: 33%; left: calc(50% - var(--min-hand-w) / 2);
+      background: var(--green);
+    }
+    .second-hand {
+      width: var(--sec-hand-w); height: 40%; left: calc(50% - var(--sec-hand-w) / 2);
+      background: var(--red);
+    }
     .analog-center {
-      position:absolute; top:50%; left:50%; width:12px; height:12px; margin:-6px 0 0 -6px;
-      border-radius:50%; background:var(--green); box-shadow:0 0 10px var(--green); z-index:2;
+      position: absolute; top: 50%; left: 50%; width: 12px; height: 12px; margin: -6px 0 0 -6px;
+      border-radius: 50%; background: var(--red); z-index: 2;
     }
 
     /* Bars row */
     .bars-row {
-      position:absolute; left:6%; right:6%; bottom:8%; height:24%;
-      gap:2px; align-items:flex-end; pointer-events:none; z-index:1;
+      position: absolute;
+      left: 5%;
+      right: 5%;
+      bottom: 8%;
+      height: 24%;
+      gap: 3px;
+      align-items: flex-end;
+      pointer-events: none;
+      z-index: 1;
     }
     .bar {
-      flex:1 1 0; min-width:0; height:60%; border-radius:2px 2px 0 0;
-      background:color-mix(in srgb, var(--green) 15%, transparent);
-      transition:background .2s, box-shadow .2s, height .2s;
+      flex: 1 1 0;
+      min-width: 0;
+      height: 58%;
+      border-radius: 2px 2px 0 0;
+      background: color-mix(in srgb, var(--green) 14%, transparent);
+      transition: background .15s, height .15s;
     }
-    .bar.hour-mark { height:80%; background:color-mix(in srgb, var(--green) 30%, transparent); }
-    .bar.on { background:var(--green); box-shadow:0 0 8px var(--green), 0 -4px 12px color-mix(in srgb, var(--green) 40%, transparent); }
-    .bar.hour-mark.on { background:var(--amber); box-shadow:0 0 10px var(--amber), 0 -4px 14px color-mix(in srgb, var(--amber) 50%, transparent); }
-
-    /* Matrix canvas */
-    .matrix-canvas { position:absolute; inset:0; border-radius:50%; pointer-events:none; z-index:0; }
-
-    /* Terminal chrome */
-    .term-bar {
-      position:absolute; top:0; left:0; right:0; height:30px; align-items:center; gap:14px;
-      padding:0 16px; z-index:3; font-size:11px; letter-spacing:.04em;
-      color:color-mix(in srgb, var(--green) 70%, #fff);
-      background:color-mix(in srgb, var(--green) 10%, transparent);
-      border-bottom:1px solid color-mix(in srgb, var(--green) 22%, transparent);
+    .bar.hour-mark {
+      height: 82%;
+      background: color-mix(in srgb, var(--green) 28%, transparent);
     }
-    .term-dots { display:flex; gap:6px; }
-    .term-dots span { width:10px; height:10px; border-radius:50%; }
-    .term-dots span:nth-child(1) { background:#ff5f57; }
-    .term-dots span:nth-child(2) { background:#febc2e; }
-    .term-dots span:nth-child(3) { background:#28c840; }
-    .term-prompt {
-      position:absolute; top:14%; left:6%; align-items:center; gap:6px; z-index:2;
-      font-size:clamp(.75rem, 2.8cqmin, 1.2rem); letter-spacing:.02em;
-      color:color-mix(in srgb, var(--green) 85%, #fff);
+    .bar.on {
+      background: var(--green);
     }
-    .term-dollar { color:var(--amber); font-weight:600; }
-    .term-cursor {
-      position:absolute; bottom:14%; left:6%; width:.6em; height:1.1em; z-index:2;
-      background:var(--green); box-shadow:0 0 10px var(--green); animation:term-blink 1s steps(1) infinite;
+    .bar.hour-mark.on {
+      background: var(--amber);
     }
-    @keyframes term-blink { 0%,49% { opacity:1; } 50%,100% { opacity:0; } }
-
-    /* HUD chrome */
-    .hud-frame { position:absolute; inset:0; pointer-events:none; z-index:1; }
-    .hud-frame::before {
-      content:''; position:absolute; inset:0; pointer-events:none;
-      background:repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.08) 2px, rgba(0,0,0,.08) 4px);
-      animation:hud-scan 6s linear infinite;
+    .bar.last10.on {
+      background: var(--red);
     }
-    @keyframes hud-scan { from { transform:translateY(0); } to { transform:translateY(4px); } }
-    .hud-corner { position:absolute; width:36px; height:36px; border:2px solid var(--green); box-shadow:0 0 8px color-mix(in srgb, var(--green) 50%, transparent); }
-    .hud-tl { top:16px;    left:16px;  border-right:none; border-bottom:none; }
-    .hud-tr { top:16px;    right:16px; border-left:none;  border-bottom:none; }
-    .hud-bl { bottom:16px; left:16px;  border-right:none; border-top:none; }
-    .hud-br { bottom:16px; right:16px; border-left:none;  border-top:none; }
-    .hud-crosshair {
-      position:absolute; top:42%; left:50%; width:55%; aspect-ratio:1; transform:translate(-50%,-50%);
-      border:1px solid color-mix(in srgb, var(--green) 35%, transparent); border-radius:50%;
-      animation:hud-pulse 3s ease-in-out infinite;
-    }
-    .hud-crosshair::before, .hud-crosshair::after { content:''; position:absolute; background:color-mix(in srgb, var(--green) 45%, transparent); }
-    .hud-crosshair::before { top:50%; left:-8%; right:-8%; height:1px; }
-    .hud-crosshair::after  { left:50%; top:-8%; bottom:-8%; width:1px; }
-    @keyframes hud-pulse { 0%,100% { opacity:.35; } 50% { opacity:.65; } }
 
     /* Sleek status block */
-    .sleek-status { position:absolute; bottom:12%; left:0; right:0; flex-direction:column; align-items:center; gap:6px; z-index:2; }
-    .sleek-details {
-      font-family:ui-monospace, 'SF Mono', 'Consolas', monospace;
-      font-size:clamp(.75rem, 2.2cqmin, 1.1rem); color:#64748b; text-align:center; line-height:1.8;
+    .sleek-status {
+      position: absolute;
+      bottom: 10%;
+      left: 0;
+      right: 0;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+      z-index: 2;
     }
-    .sleek-details span { color:#94a3b8; }
+    .sleek-details {
+      font-size: clamp(.72rem, 2cqmin, 1rem);
+      color: var(--precis);
+      text-align: center;
+      line-height: 1.75;
+    }
+    .sleek-details span { color: var(--green); font-weight: 500; }
 
-    /* ── 5. Visibility map ───────────────────────────────────────
-       Optional elements are hidden by default and switched on
-       per model. To add a model, edit only this section.     */
-    .led, .hour-led, .countdown, .progress-bar-container, .analog-hands, .matrix-canvas,
-    .bars-row, .term-bar, .term-prompt, .term-cursor, .hud-frame, .sleek-status { display:none; }
+    /* World Hubs Layout (Studio Master + 5 Global Clocks) */
+    .world-layout {
+      position: absolute;
+      inset: 0;
+      padding: clamp(14px, 3cqmin, 28px);
+      display: none;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: clamp(12px, 2.5cqmin, 22px);
+      z-index: 2;
+    }
+    .world-master {
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: var(--card-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: 10px;
+      padding: clamp(10px, 2cqmin, 20px);
+      position: relative;
+    }
+    .world-master-header {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: clamp(.65rem, 1.8cqmin, .95rem);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      color: var(--amber);
+      margin-bottom: 4px;
+    }
+    .world-tally-badge {
+      padding: 2px 7px;
+      border-radius: 4px;
+      font-size: 0.78em;
+      font-weight: 700;
+      background: var(--accent-soft);
+      color: var(--green);
+      border: 1px solid color-mix(in srgb, var(--green) 35%, transparent);
+    }
+    .world-master-time {
+      font-size: clamp(2.4rem, 11.5cqmin, 5.8rem);
+      font-weight: 600;
+      color: var(--green);
+      line-height: 1.05;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.02em;
+    }
+    .world-master-time .w-ms {
+      font-size: 0.45em;
+      color: var(--precis);
+      font-weight: 400;
+    }
+    .world-master-time .w-period {
+      font-size: 0.38em;
+      color: var(--amber);
+      margin-left: 0.25em;
+    }
+    .world-master-sub {
+      margin-top: 6px;
+      font-size: clamp(.65rem, 1.8cqmin, .95rem);
+      color: var(--precis);
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+    }
+    .world-grid {
+      display: grid;
+      grid-template-columns: repeat(5, 1fr);
+      gap: clamp(8px, 1.5cqmin, 14px);
+    }
+    .world-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border-subtle);
+      border-radius: 8px;
+      padding: clamp(8px, 1.6cqmin, 14px) clamp(6px, 1.2cqmin, 12px);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-width: 0;
+    }
+    .world-card-city {
+      width: 100%;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      font-size: clamp(.62rem, 1.65cqmin, .88rem);
+      font-weight: 600;
+      color: var(--amber);
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+    }
+    .world-card-time {
+      margin: 4px 0 2px;
+      font-size: clamp(1rem, 3.1cqmin, 1.65rem);
+      font-weight: 500;
+      color: var(--green);
+      font-variant-numeric: tabular-nums;
+      white-space: nowrap;
+    }
+    .world-card-meta {
+      font-size: clamp(.55rem, 1.35cqmin, .75rem);
+      color: var(--precis);
+      white-space: nowrap;
+    }
 
-    #circle:is(.model-room-control, .model-analog, .model-sleek-analog) :is(.led, .hour-led) { display:block; }
-    #circle:is(.model-room-control, .model-minimal, .model-terminal, .model-hud) .countdown { display:block; }
-    #circle:is(.model-room-control, .model-modern, .model-neon) .progress-bar-container { display:block; }
-    #circle:is(.model-analog, .model-sleek-analog) .analog-hands { display:block; }
-    #circle.model-matrix   .matrix-canvas { display:block; }
-    #circle.model-bars     .bars-row      { display:flex; }
-    #circle.model-terminal :is(.term-bar, .term-prompt) { display:flex; }
-    #circle.model-terminal .term-cursor   { display:block; }
-    #circle.model-hud      .hud-frame     { display:block; }
-    #circle.model-sleek    .sleek-status  { display:flex; }
+    /* ── 5. Visibility Map ─────────────────────────────────────── */
+    .led, .hour-led, .countdown, .progress-bar-container, .analog-hands,
+    .bars-row, .sleek-status, .world-layout { display: none; }
 
-    /* Elements that are visible by default but hidden in some models */
+    #circle:is(.model-room-control, .model-analog, .model-sleek-analog) :is(.led, .hour-led) { display: block; }
+    #circle.model-room-control .countdown { display: block; }
+    #circle.model-room-control .progress-bar-container { display: block; }
+    #circle:is(.model-analog, .model-sleek-analog) .analog-hands { display: block; }
+    #circle.model-bars .bars-row { display: flex; }
+    #circle.model-sleek .sleek-status { display: flex; }
+    #circle.model-world .world-layout { display: flex; }
+
+    /* Hide default single-clock nodes when model-world or analog is active */
     #circle:is(.model-analog, .model-sleek-analog) .digital-clock,
     #circle.model-sleek-analog .digital-date,
-    #circle.model-sleek :is(.precision-clock, .tz-label, .signature) { display:none; }
-    #circle.model-sleek ~ .live-status { display:none; }
+    #circle.model-sleek :is(.precision-clock, .tz-label, .signature),
+    #circle.model-world :is(.digital-clock, .digital-date, .precision-clock, .tz-label, .signature) {
+      display: none;
+    }
+    #circle.model-sleek ~ .live-status { display: none; }
 
-    /* Text outline is only used by the "classic" looks */
-    #circle:is(.model-minimal, .model-neon, .model-bars, .model-matrix, .model-terminal, .model-hud, .model-sleek, .model-big-display)
-      :is(.digital-clock, .digital-date, .countdown) { -webkit-text-stroke:0; }
-
-    /* ── 6. models ─────────────────────────────────────────── */
-
-    /* room-control: default look, no overrides needed */
-
+    /* ── 6. Models ───────────────────────────────────────────── */
     /* Analog */
-    #circle.model-analog .led { width:clamp(3px,1cqmin,6px); height:clamp(3px,1cqmin,6px); background:#333; opacity:.6; }
-    #circle.model-analog .led.on { background:var(--red); opacity:1; }
-    #circle.model-analog .hour-led { width:clamp(5px,1.6cqmin,10px); height:clamp(5px,1.6cqmin,10px); background:#4a4a4a; opacity:.7; }
-    #circle.model-analog .hour-led.on { background:var(--green); opacity:1; }
-    #circle.model-analog .digital-date { top:24%; font-size:clamp(.7rem, 3.2cqmin, 1.5rem); }
+    #circle.model-analog .led { width: clamp(3px, 1cqmin, 6px); height: clamp(3px, 1cqmin, 6px); background: var(--sec-off); opacity: .75; }
+    #circle.model-analog .led.on { background: var(--red); opacity: 1; }
+    #circle.model-analog .hour-led { width: clamp(5px, 1.6cqmin, 10px); height: clamp(5px, 1.6cqmin, 10px); background: var(--hour-off); opacity: .85; }
+    #circle.model-analog .hour-led.on { background: var(--green); opacity: 1; }
+    #circle.model-analog .digital-date { top: 26%; font-size: clamp(.65rem, 2.8cqmin, 1.3rem); }
+    #circle.model-analog .signature { top: 19.5%; bottom: auto; transform: translate(-50%, -50%); opacity: .65; }
 
     /* Sleek Analog */
-    #circle.model-sleek-analog { background:var(--face-bg); box-shadow:0 0 40px #030303; }
     #circle.model-sleek-analog .hour-led {
-      width:clamp(3px,.8cqmin,5px); height:clamp(12px,3.5cqmin,18px); border-radius:1px;
-      background:#5c6f8a; opacity:1; transform:translate(-50%,-50%) rotate(var(--rot, 0deg));
+      width: clamp(3px, .8cqmin, 5px); height: clamp(12px, 3.5cqmin, 18px); border-radius: 1px;
+      background: var(--hour-off); opacity: 1; transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
     }
-    #circle.model-sleek-analog .hour-led.on { background:#a4bcd6; box-shadow:0 0 8px #a4bcd6; }
+    #circle.model-sleek-analog .hour-led.on { background: var(--green); }
     #circle.model-sleek-analog .led {
-      width:clamp(2px,.5cqmin,3px); height:clamp(6px,1.8cqmin,10px); border-radius:1px;
-      background:#36445c; opacity:1; transform:translate(-50%,-50%) rotate(var(--rot, 0deg));
+      width: clamp(2px, .5cqmin, 3px); height: clamp(6px, 1.8cqmin, 10px); border-radius: 1px;
+      background: var(--sec-off); opacity: 1; transform: translate(-50%, -50%) rotate(var(--rot, 0deg));
     }
-    #circle.model-sleek-analog .led.on { background:#a4bcd6; }
-    #circle.model-sleek-analog .hour-hand   { height:22%; background:#a4bcd6; box-shadow:none; }
-    #circle.model-sleek-analog .minute-hand { height:34%; background:#a4bcd6; box-shadow:none; }
-    #circle.model-sleek-analog .second-hand { height:38%; background:#ff7b00; box-shadow:none; }
-    #circle.model-sleek-analog .analog-center { width:14px; height:14px; margin:-7px 0 0 -7px; background:#ff7b00; box-shadow:none; }
-    #circle.model-sleek-analog .tz-label { top:74%; bottom:auto; color:#a4bcd6; opacity:1; font-size:clamp(.6rem,2.2cqmin,1.1rem); letter-spacing:.1em; }
-    #circle.model-sleek-analog .precision-clock { top:76.5%; bottom:auto; color:#9e5c1e; opacity:1; font-size:clamp(.7rem,2.5cqmin,1.2rem); }
-    #circle.model-sleek-analog .signature { top:80%; bottom:auto; color:#5c6f8a; opacity:.7; font-size:clamp(.5rem,1.5cqmin,.8rem); }
-
-    /* Minimal */
-    #circle.model-minimal .digital-clock {
-      top:50%; font-size:clamp(1.8rem, 18cqmin, 8.5rem);
-      text-shadow:0 0 24px color-mix(in srgb, var(--green) 35%, transparent);
-    }
-    #circle.model-minimal .digital-clock.h12 { font-size:clamp(1.4rem, 14cqmin, 6.8rem); }
-    #circle.model-minimal .digital-date { top:38%; font-size:clamp(.65rem, 3.2cqmin, 1.3rem); opacity:.85; }
-    #circle.model-minimal .precision-clock { bottom:24%; font-size:clamp(.55rem, 1.8cqmin, 1rem); }
-    #circle.model-minimal .tz-label { bottom:68%; }
-    #circle.model-minimal .signature { bottom:22%; }
-
-    /* Modern */
-    #circle.model-modern::after {
-      content:''; position:absolute; inset:2%; border-radius:50%; pointer-events:none; z-index:0;
-      background:conic-gradient(from 0deg,
-        var(--modern-color, var(--green)) 0deg,
-        var(--modern-color, var(--green)) var(--progress-deg, 0deg),
-        rgba(255,255,255,.05) var(--progress-deg, 0deg));
-      -webkit-mask:radial-gradient(circle, transparent calc(100% - 10px), #000 calc(100% - 10px));
-              mask:radial-gradient(circle, transparent calc(100% - 10px), #000 calc(100% - 10px));
-    }
-    #circle.model-modern .digital-clock { z-index:1; }
-    #circle.model-modern .signature { z-index:1; bottom:26%; }
-    #circle.model-modern .precision-clock { bottom:29%; }
-    #circle.model-modern .tz-label { bottom:32%; }
-    #circle.model-modern .progress-bar-container {
-      top:auto; bottom:35%; width:120%; height:20px; border:none;
-      background:color-mix(in srgb, var(--green) 15%, transparent);
-    }
-    #circle.model-modern .progress-bar-fill { border-radius:3px; box-shadow:0 0 8px currentColor; }
-
-    /* Neon */
-    #circle.model-neon {
-      background:var(--face-bg); overflow:hidden;
-      border:1px solid color-mix(in srgb, var(--green) 60%, transparent);
-      box-shadow:0 0 50px color-mix(in srgb, var(--green) 20%, transparent),
-                 inset 0 0 80px color-mix(in srgb, var(--green) 6%, transparent);
-    }
-    #circle.model-neon::before {
-      content:''; position:absolute; inset:0; pointer-events:none; z-index:0; opacity:.6;
-      background-image:
-        repeating-linear-gradient(0deg,  transparent, transparent 19px, color-mix(in srgb, var(--green) 8%, transparent) 19px, color-mix(in srgb, var(--green) 8%, transparent) 20px),
-        repeating-linear-gradient(90deg, transparent, transparent 19px, color-mix(in srgb, var(--green) 8%, transparent) 19px, color-mix(in srgb, var(--green) 8%, transparent) 20px);
-    }
-    #circle.model-neon::after {
-      content:''; position:absolute; inset:0; pointer-events:none; z-index:3;
-      background:repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.18) 2px, rgba(0,0,0,.18) 4px);
-      animation:scan 8s linear infinite;
-    }
-    @keyframes scan { from { transform:translateY(0); } to { transform:translateY(20px); } }
-    #circle.model-neon .digital-clock {
-      top:48%; z-index:1; font-size:clamp(2rem, 18cqmin, 7rem);
-      text-shadow:0 0 24px var(--green), 0 0 48px color-mix(in srgb, var(--green) 40%, transparent);
-    }
-    #circle.model-neon .digital-clock.h12 { font-size:clamp(1.5rem, 14cqmin, 5.5rem); }
-    #circle.model-neon .digital-date {
-      top:10%; left:5%; transform:none; text-align:left; z-index:2;
-      font-size:clamp(.6rem, 2.8cqmin, 1.1rem); letter-spacing:.08em;
-    }
-    #circle.model-neon .precision-clock { bottom:22%; left:5%; transform:none; text-align:left; z-index:2; font-size:clamp(.55rem, 1.8cqmin, 1rem); }
-    #circle.model-neon .tz-label { bottom:22%; left:auto; right:5%; transform:none; text-align:right; max-width:45%; z-index:2; }
-    #circle.model-neon .signature { top:5%; bottom:auto; left:auto; right:5%; transform:none; opacity:.4; z-index:2; font-size:clamp(.5rem, 1.4cqmin, .8rem); }
-    #circle.model-neon .progress-bar-container {
-      top:auto; bottom:8%; left:5%; right:5%; width:auto; transform:none; height:3px; z-index:2;
-      border:none; border-radius:0; background:color-mix(in srgb, var(--green) 15%, transparent);
-    }
-    #circle.model-neon .progress-bar-fill { border-radius:0; box-shadow:0 0 8px var(--green); }
+    #circle.model-sleek-analog .led.on { background: var(--amber); }
+    #circle.model-sleek-analog .hour-hand   { height: 22%; background: var(--green); }
+    #circle.model-sleek-analog .minute-hand { height: 34%; background: var(--green); }
+    #circle.model-sleek-analog .second-hand { height: 39%; background: var(--red); }
+    #circle.model-sleek-analog .analog-center { width: 12px; height: 12px; margin: -6px 0 0 -6px; background: var(--red); }
+    #circle.model-sleek-analog .tz-label { top: 74%; bottom: auto; color: var(--green); opacity: .9; font-size: clamp(.6rem, 2.1cqmin, 1rem); letter-spacing: .1em; }
+    #circle.model-sleek-analog .precision-clock { top: 76.5%; bottom: auto; color: var(--amber); opacity: .9; font-size: clamp(.65rem, 2.3cqmin, 1.15rem); }
+    #circle.model-sleek-analog .signature { top: 23%; bottom: auto; transform: translate(-50%, -50%); opacity: .65; }
 
     /* Bars */
-    #circle.model-bars { background:var(--face-bg); border:1px solid color-mix(in srgb, var(--green) 25%, transparent); }
-    #circle.model-bars .digital-clock {
-      top:40%; font-size:clamp(1.8rem, 13cqmin, 5rem);
-      text-shadow:0 0 12px color-mix(in srgb, var(--green) 30%, transparent);
-    }
-    #circle.model-bars .digital-clock.h12 { font-size:clamp(1.4rem, 10cqmin, 4rem); }
-    #circle.model-bars .digital-date { top:12%; font-size:clamp(.6rem, 3cqmin, 1.2rem); }
-    #circle.model-bars .precision-clock { top:58%; bottom:auto; font-size:clamp(.55rem, 1.9cqmin, 1rem); }
-    #circle.model-bars .tz-label { top:22%; bottom:auto; font-size:clamp(.5rem, 1.8cqmin, .85rem); }
-    #circle.model-bars .signature { bottom:2%; opacity:.35; font-size:clamp(.5rem, 1.2cqmin, .75rem); }
-
-    /* Matrix */
-    #circle.model-matrix .digital-clock {
-      z-index:3; -webkit-text-stroke:min(2px,.04em) #000;
-      text-shadow:0 0 20px var(--green), 0 0 40px var(--green), 0 0 60px color-mix(in srgb, var(--green) 60%, transparent);
-    }
-    #circle.model-matrix .digital-date { z-index:3; text-shadow:0 0 10px var(--amber); }
-    #circle.model-matrix :is(.precision-clock, .tz-label, .signature) { z-index:3; }
-
-    /* Terminal */
-    #circle.model-terminal {
-      --ar-w:16; --ar-h:10; --rect-vw:92vw; --rect-max:860px; --radius:10px;
-      background:color-mix(in srgb, var(--face-bg) 85%, var(--green) 15%); overflow:hidden;
-      border:1px solid color-mix(in srgb, var(--green) 40%, transparent);
-      box-shadow:0 0 40px color-mix(in srgb, var(--green) 15%, transparent), inset 0 0 100px color-mix(in srgb, var(--green) 3%, transparent);
-      font-family:ui-monospace, 'SF Mono', 'Consolas', 'Courier New', monospace;
-    }
-    #circle.model-terminal::after {
-      content:''; position:absolute; inset:0; pointer-events:none; z-index:10;
-      background:repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,.08) 2px, rgba(0,0,0,.08) 4px);
-    }
-    @keyframes terminal-glow {
-      0%,100% { text-shadow:0 0 12px color-mix(in srgb, var(--green) 40%, transparent); }
-      50%     { text-shadow:0 0 22px color-mix(in srgb, var(--green) 75%, transparent); }
-    }
-    #circle.model-terminal .digital-clock {
-      top:34%; left:6%; transform:none; text-align:left; z-index:2;
-      font-size:clamp(1.6rem, 8cqmin, 3.4rem); animation:terminal-glow 3s ease-in-out infinite;
-    }
-    #circle.model-terminal .digital-clock.h12 { font-size:clamp(1.3rem, 6.5cqmin, 2.8rem); }
-    #circle.model-terminal .tz-label {
-      top:47%; bottom:auto; left:6%; right:auto; transform:none; text-align:left; max-width:50%; z-index:2;
-      color:color-mix(in srgb, var(--green) 60%, #fff); opacity:.85; font-size:clamp(.6rem, 2cqmin, .9rem); letter-spacing:.1em;
-    }
-    #circle.model-terminal .digital-date {
-      top:60%; left:6%; transform:none; text-align:left; width:auto; white-space:nowrap; z-index:2;
-      font-size:clamp(.7rem, 2.5cqmin, 1.1rem);
-    }
-    #circle.model-terminal .countdown { top:68%; left:6%; transform:none; text-align:left; opacity:.85; z-index:2; font-size:clamp(.65rem, 2.2cqmin, 1rem); }
-    #circle.model-terminal .countdown::before { content:'→ '; color:var(--amber); }
-    #circle.model-terminal .precision-clock {
-      bottom:8%; left:6%; transform:none; text-align:left; z-index:2;
-      color:color-mix(in srgb, var(--green) 55%, #fff); opacity:.7; font-size:clamp(.55rem, 1.8cqmin, .85rem);
-    }
-    #circle.model-terminal .precision-clock::before { content:'› '; color:var(--amber); }
-    #circle.model-terminal .signature { bottom:8%; left:auto; right:6%; transform:none; text-align:right; opacity:.4; z-index:2; font-size:clamp(.5rem, 1.4cqmin, .75rem); }
-
-    /* HUD */
-    #circle.model-hud {
-      --ar-w:16; --ar-h:10; --rect-vw:92vw; --rect-max:860px; --radius:12px;
-      background:color-mix(in srgb, var(--face-bg) 88%, var(--green) 12%); overflow:hidden;
-      border:1px solid color-mix(in srgb, var(--green) 30%, transparent);
-      box-shadow:0 0 50px color-mix(in srgb, var(--green) 12%, transparent), inset 0 0 100px color-mix(in srgb, var(--green) 2%, transparent);
-    }
-    #circle.model-hud .digital-clock {
-      top:42%; z-index:3; font-size:clamp(1.8rem, 10cqmin, 4rem);
-      text-shadow:0 0 20px color-mix(in srgb, var(--green) 60%, transparent);
-    }
-    #circle.model-hud .digital-clock.h12 { font-size:clamp(1.4rem, 8cqmin, 3.2rem); }
-    #circle.model-hud .countdown { top:60%; z-index:3; opacity:.9; font-size:clamp(.9rem, 4cqmin, 1.6rem); }
-    #circle.model-hud .digital-date {
-      top:7%; left:4%; transform:none; text-align:left; width:auto; white-space:nowrap; z-index:3;
-      color:color-mix(in srgb, var(--green) 70%, #fff); font-size:clamp(.6rem, 2cqmin, .9rem); letter-spacing:.06em;
-    }
-    #circle.model-hud .tz-label {
-      top:7%; bottom:auto; left:auto; right:4%; transform:none; text-align:right; max-width:40%; z-index:3;
-      color:color-mix(in srgb, var(--green) 70%, #fff); opacity:.7; font-size:clamp(.6rem, 2cqmin, .9rem); letter-spacing:.06em;
-    }
-    #circle.model-hud .precision-clock {
-      bottom:7%; left:4%; transform:none; text-align:left; z-index:3;
-      color:color-mix(in srgb, var(--green) 60%, #fff); opacity:.75; font-size:clamp(.55rem, 1.8cqmin, .85rem);
-    }
-    #circle.model-hud .signature { bottom:7%; left:auto; right:4%; transform:none; text-align:right; opacity:.4; z-index:3; font-size:clamp(.5rem, 1.4cqmin, .75rem); }
+    #circle.model-bars { background: var(--face-bg); }
+    #circle.model-bars .digital-clock { top: 41%; font-size: clamp(1.8rem, 13.5cqmin, 5.2rem); }
+    #circle.model-bars .digital-clock.h12 { font-size: clamp(1.4rem, 10.5cqmin, 4.1rem); }
+    #circle.model-bars .digital-date { top: 12%; font-size: clamp(.6rem, 2.6cqmin, 1.15rem); }
+    #circle.model-bars .precision-clock { top: 58%; bottom: auto; font-size: clamp(.55rem, 1.9cqmin, 1rem); }
+    #circle.model-bars .tz-label { top: 21%; bottom: auto; font-size: clamp(.55rem, 1.8cqmin, .9rem); }
+    #circle.model-bars .signature { bottom: 2.5%; }
 
     /* Sleek */
     #circle.model-sleek {
-      --radius:12px;
-      background:#0d0d0d; border:1px solid #1f1f1f; box-shadow:0 10px 40px rgba(0,0,0,.5);
-      font-family:-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      --radius: 14px;
+      background: var(--face-bg);
+      font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
     }
     #circle.model-sleek .digital-date {
-      top:22%; width:auto; white-space:nowrap;
-      color:#7a7f87; font-size:clamp(1rem, 2.8cqmin, 1.4rem); font-weight:500;
-      letter-spacing:.15em; text-transform:uppercase;
+      top: 19%; width: auto; white-space: nowrap;
+      color: var(--amber); font-size: clamp(.9rem, 2.5cqmin, 1.3rem); font-weight: 500;
+      letter-spacing: .14em;
     }
     #circle.model-sleek .digital-clock {
-      top:45%; font-size:clamp(4rem, 22cqmin, 11rem);
-      color:#f8fafc; font-weight:300; letter-spacing:-.02em;
+      top: 43%; font-size: clamp(3.6rem, 20cqmin, 9.5rem);
+      color: var(--green); font-weight: 400; letter-spacing: -.02em;
+      font-family: ui-monospace, 'SF Mono', 'Consolas', monospace;
     }
-    #circle.model-sleek .digital-clock.h12 { font-size:clamp(3rem, 18cqmin, 8.5rem); }
-    #circle.model-sleek .digital-clock .ms { display:inline; color:#64748b; font-size:.6em; font-weight:400; letter-spacing:0; }
-    #circle.model-sleek .digital-clock .period { color:#94a3b8; font-size:.45em; font-weight:500; margin-left:8px; letter-spacing:.05em; }
+    #circle.model-sleek .digital-clock.h12 { font-size: clamp(2.8rem, 16cqmin, 7.6rem); }
+    #circle.model-sleek .digital-clock .ms { display: inline; color: var(--precis); font-size: .52em; font-weight: 400; }
+    #circle.model-sleek .digital-clock .period { color: var(--amber); font-size: .4em; font-weight: 500; margin-left: 8px; }
 
-    /* Big Display – time fills almost the whole screen, everything else is small */
+    /* Big Display */
     #circle.model-big-display {
-      aspect-ratio:auto; width:98vw; height:calc(100dvh - var(--chrome));
-      border-radius:12px; background:var(--face-bg);
-      border:1px solid color-mix(in srgb, var(--blu) 25%, transparent);
+      aspect-ratio: auto;
+      width: 98vw;
+      height: calc(100dvh - var(--chrome));
+      border-radius: 12px;
+      background: var(--face-bg);
     }
     #circle.model-big-display .digital-clock {
-      top:50%; font-size:min(17.5cqw, 55cqh); line-height:1; letter-spacing:0;
-      text-shadow:0 0 30px color-mix(in srgb, var(--blu) 40%, transparent);
+      top: 50%; font-size: min(17.5cqw, 54cqh); line-height: 1;
     }
-    #circle.model-big-display .digital-clock.h12 { font-size:min(14.5cqw, 50cqh);color:var(--yell) }
-    #circle.model-big-display .digital-clock .period { font-size:.3em; margin-left:.25em; color: var(--yell) }
+    #circle.model-big-display .digital-clock.h12 { font-size: min(14.5cqw, 48cqh); }
+    #circle.model-big-display .digital-clock .period { font-size: .28em; margin-left: .25em; color: var(--amber); }
     #circle.model-big-display .digital-date {
-      top:5%; left:3%; transform:none; width:auto; white-space:nowrap; text-align:left;
-      font-size:max(.8rem, min(2.6cqw, 5cqh)); color: var(--blu);
+      top: 5%; left: 3%; transform: none; width: auto; text-align: left;
+      font-size: max(.8rem, min(2.4cqw, 4.5cqh));
     }
     #circle.model-big-display .tz-label {
-      top:5%; bottom:auto; left:auto; right:3%; transform:none; text-align:right; max-width:40%;
-      font-size:max(.7rem, min(2cqw, 4cqh)); opacity:.8; color:var(--yell)
+      top: 5%; bottom: auto; left: auto; right: 3%; transform: none; text-align: right; max-width: 40%;
+      font-size: max(.75rem, min(2cqw, 4cqh)); color: var(--amber);
     }
     #circle.model-big-display .precision-clock {
-      bottom:4%; left:3%; transform:none; text-align:left;
-      font-size:max(.65rem, min(1.8cqw, 3.5cqh));
+      bottom: 4%; left: 3%; transform: none; text-align: left;
+      font-size: max(.65rem, min(1.8cqw, 3.5cqh));
     }
     #circle.model-big-display .signature {
-      bottom:4%; left:auto; right:3%; transform:none; text-align:right; opacity:.4;
-      font-size:max(.55rem, min(1.2cqw, 2.5cqh)); color: var(--blu);
+      bottom: 4%; left: auto; right: 3%; transform: none; text-align: right;
+      font-size: max(.55rem, min(1.2cqw, 2.5cqh));
     }
 
-    /* ── 7. UI: settings & status bar ────────────────────────── */
+    /* ── 7. UI: Settings & Status Bar ────────────────────────── */
     .settings-button {
-      position:fixed; z-index:5; top:14px; right:16px; width:42px; height:42px;
-      border:1px solid #484848; border-radius:50%; background:#111e; color:#ddd; font-size:20px; cursor:pointer;
+      position: fixed; z-index: 5; top: 14px; right: 16px; width: 40px; height: 40px;
+      border: 1px solid #334155; border-radius: 8px; background: rgba(15, 23, 42, 0.85);
+      color: #e2e8f0; font-size: 18px; cursor: pointer;
     }
+    .settings-button:hover { border-color: var(--green); color: var(--green); }
+
     .settings-panel {
-      position:fixed; z-index:6; top:64px; right:16px; width:min(340px, calc(100vw - 32px));
-      max-height:calc(100vh - 80px); overflow-y:auto; padding:16px 18px;
-      border:1px solid #494949; border-radius:10px; background:#101210f2; color:#eee;
-      box-shadow:0 14px 44px #000c; backdrop-filter:blur(4px); font:14px/1.4 system-ui,sans-serif;
+      position: fixed; z-index: 6; top: 62px; right: 16px; width: min(360px, calc(100vw - 32px));
+      max-height: calc(100vh - 78px); overflow-y: auto; padding: 16px 18px;
+      border: 1px solid #334155; border-radius: 10px; background: rgba(10, 14, 18, 0.96); color: #f1f5f9;
+      box-shadow: 0 16px 48px rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px);
+      font: 13px/1.4 system-ui, -apple-system, sans-serif;
     }
-    .settings-panel[hidden] { display:none; }
-    .settings-panel h2 { margin:0 0 10px; font-size:14px; color:#aab3ad; font-weight:600; letter-spacing:.03em; text-transform:uppercase; }
-    .setting-row { display:grid; grid-template-columns:1fr 1fr; align-items:center; gap:12px; margin-top:10px; }
-    .setting-row.pulse-row { grid-template-columns:1fr auto; }
-    .setting-row label { color:#aab3ad; font-size:12px; }
-    .setting-row select { width:100%; min-width:0; min-height:34px; padding:0 8px; border:1px solid #444; border-radius:6px; background:#080a09; color:#eee; }
-    .pulse-toggle { appearance:none; position:relative; width:38px; height:22px; border-radius:12px; background:#3b423d; cursor:pointer; transition:background .15s; }
-    .pulse-toggle::after { content:""; position:absolute; top:3px; left:3px; width:16px; height:16px; border-radius:50%; background:#ddd; transition:transform .15s; }
-    .pulse-toggle:checked { background:#078d32; }
-    .pulse-toggle:checked::after { transform:translateX(16px); background:#fff; }
+    .settings-panel[hidden] { display: none; }
+    .settings-panel h2, .settings-panel h3 {
+      margin: 0 0 10px; font-size: 12px; color: #94a3b8; font-weight: 700;
+      letter-spacing: .06em; text-transform: uppercase;
+    }
+    .settings-panel h3 { margin-top: 16px; padding-top: 12px; border-top: 1px solid #1e293b; }
+
+    .setting-row {
+      display: grid; grid-template-columns: 1fr 1.15fr; align-items: center; gap: 10px; margin-top: 9px;
+    }
+    .setting-row.pulse-row { grid-template-columns: 1fr auto; }
+    .setting-row label { color: #cbd5e1; font-size: 12px; }
+    .setting-row select {
+      width: 100%; min-width: 0; min-height: 32px; padding: 0 8px;
+      border: 1px solid #334155; border-radius: 6px; background: #090d12; color: #f8fafc;
+      font-size: 12px;
+    }
+
+    .world-settings-group[hidden] { display: none; }
+
+    .pulse-toggle {
+      appearance: none; position: relative; width: 38px; height: 22px; border-radius: 12px;
+      background: #334155; cursor: pointer; transition: background .15s;
+    }
+    .pulse-toggle::after {
+      content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px;
+      border-radius: 50%; background: #e2e8f0; transition: transform .15s;
+    }
+    .pulse-toggle:checked { background: #059669; }
+    .pulse-toggle:checked::after { transform: translateX(16px); background: #fff; }
+
     .resync-button {
-      margin-top:14px; width:100%; padding:8px 10px; border:1px solid #444; border-radius:6px;
-      background:#0f1311; color:#cfd8d2; font:13px system-ui,sans-serif; cursor:pointer;
+      margin-top: 14px; width: 100%; padding: 8px 10px; border: 1px solid #334155; border-radius: 6px;
+      background: #111827; color: #e2e8f0; font: 600 12px system-ui, sans-serif; cursor: pointer;
     }
-    .resync-button:hover { background:#171d19; }
-    .resync-button:disabled { opacity:.5; cursor:wait; }
+    .resync-button:hover { border-color: var(--green); color: var(--green); }
+    .resync-button:disabled { opacity: .5; cursor: wait; }
 
     .live-status {
-      position:fixed; z-index:4; left:0; right:0; bottom:10px; margin:0 auto;
-      width:fit-content; max-width:calc(100vw - 16px);
-      display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:4px 10px;
-      padding:6px 12px; border:1px solid #253028; border-radius:6px; background:#080b0aee;
-      color:#aab5ad; font:12px/1.3 monospace; font-variant-numeric:tabular-nums; box-shadow:0 4px 16px #000a;
+      position: fixed; z-index: 4; left: 0; right: 0; bottom: 10px; margin: 0 auto;
+      width: fit-content; max-width: calc(100vw - 16px);
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 4px 10px;
+      padding: 6px 12px; border: 1px solid var(--border-subtle); border-radius: 6px;
+      background: var(--card-bg); color: #94a3b8;
+      font: 11.5px/1.3 ui-monospace, 'SF Mono', monospace; font-variant-numeric: tabular-nums;
     }
-    .status-main { display:flex; align-items:center; gap:8px; min-width:0; max-width:100%; }
-    .status-metrics { display:flex; flex-wrap:wrap; align-items:center; justify-content:center; gap:2px 10px; min-width:0; }
-    .live-status i { flex:0 0 auto; width:8px; height:8px; border-radius:50%; background:#777; }
-    .live-status i.ok   { background:var(--green); box-shadow:0 0 6px var(--green); }
-    .live-status i.warn { background:var(--amber); }
-    .live-status i.bad  { background:var(--red); }
-    .live-status i.busy {background:var(--amber);animation:sync-pulse 1s ease-in-out infinite;}
-     @keyframes sync-pulse {0%, 100% { opacity:.35; box-shadow:0 0 0 transparent; }50%      { opacity:1; box-shadow:0 0 8px var(--amber); }}
-    .live-status #syncText { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; min-width:0; }
-    .live-status .metric { flex:0 0 auto; white-space:nowrap; color:#7a8a80; }
-    .live-status .metric b { font-weight:500; }
-    .live-status .metric b.q-excellent { color:var(--green); }
-    .live-status .metric b.q-good      { color:var(--amber); }
-    .live-status .metric b.q-weak      { color:var(--red); }
-    .live-status .divider { color:#3a4540; }
-    .status-metrics[hidden], .metric[hidden], .divider[hidden] { display:none; }
+    .status-main { display: flex; align-items: center; gap: 8px; min-width: 0; max-width: 100%; }
+    .status-metrics { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 2px 10px; }
+    .live-status i { flex: 0 0 auto; width: 8px; height: 8px; border-radius: 50%; background: #64748b; }
+    .live-status i.ok   { background: var(--green); box-shadow: 0 0 6px var(--green); }
+    .live-status i.warn { background: var(--amber); }
+    .live-status i.bad  { background: var(--red); }
+    .live-status i.busy { background: var(--amber); animation: sync-pulse 1s ease-in-out infinite; }
+    @keyframes sync-pulse { 0%, 100% { opacity: .35; } 50% { opacity: 1; } }
+    .live-status .metric b { font-weight: 600; }
+    .live-status .metric b.q-excellent { color: var(--green); }
+    .live-status .metric b.q-good      { color: var(--amber); }
+    .live-status .metric b.q-weak      { color: var(--red); }
+    .live-status .divider { color: #334155; }
+    .status-metrics[hidden], .metric[hidden], .divider[hidden] { display: none; }
 
     /* ── 8. Responsive ───────────────────────────────────────── */
-    @media (max-width:720px) {
-      .live-status .divider { display:none; }
-    }
-    @media (max-width:600px) {
-      :root { --chrome:88px; --hour-hand-w:4px; --min-hand-w:3px; --sec-hand-w:1.5px; }
-      .clock-circle { width:min(96vmin, 96vw, calc(100dvh - var(--chrome))); }
-      #circle:is(.model-neon, .model-bars, .model-terminal, .model-hud, .model-sleek) {
-        --ar-w:4; --ar-h:3; --rect-vw:94vw; --rect-max:600px;
+    @media (max-width: 820px) {
+      #circle.model-world {
+        aspect-ratio: auto;
+        width: 94vw;
+        height: calc(100dvh - var(--chrome));
       }
-      .progress-bar-container { height:8px; }
-      .live-status { font-size:11px; gap:3px 8px; padding:5px 10px; }
+      .world-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .world-grid .world-card:last-child {
+        grid-column: span 2;
+      }
     }
-    @media (max-width:380px) {
-      .live-status { font-size:10px; }
+    @media (max-width: 600px) {
+      :root { --chrome: 86px; --hour-hand-w: 4px; --min-hand-w: 3px; --sec-hand-w: 1.5px; }
+      .clock-circle { width: min(96vmin, 96vw, calc(100dvh - var(--chrome))); }
+      #circle:is(.model-bars, .model-sleek) {
+        --ar-w: 4; --ar-h: 3; --rect-vw: 94vw; --rect-max: 600px;
+      }
+      .live-status .divider { display: none; }
+      .live-status { font-size: 10.5px; padding: 5px 9px; }
     }
   </style>
 </head>
 <body>
-  <main class="clock-circle model-room-control" id="circle" aria-label="MasterClock LED">
+  <main class="clock-circle model-room-control" id="circle" aria-label="MasterClock Broadcast">
     <div class="digital-date" id="digitalDate"></div>
-
-    <canvas class="matrix-canvas" id="matrixCanvas" aria-hidden="true"></canvas>
-
-    <div class="term-bar" aria-hidden="true">
-      <span class="term-dots"><span></span><span></span><span></span></span>
-      <span class="term-title">masterclock@now:~</span>
-    </div>
-    <div class="term-prompt" aria-hidden="true"><span class="term-dollar">$</span> masterclock --show</div>
-    <div class="term-cursor" aria-hidden="true"></div>
-
-    <div class="hud-frame" aria-hidden="true">
-      <span class="hud-corner hud-tl"></span>
-      <span class="hud-corner hud-tr"></span>
-      <span class="hud-corner hud-bl"></span>
-      <span class="hud-corner hud-br"></span>
-      <span class="hud-crosshair"></span>
-    </div>
 
     <div class="analog-hands" aria-hidden="true">
       <div class="analog-hand hour-hand"   id="hourHand"></div>
@@ -591,15 +697,32 @@
       <div class="analog-center"></div>
     </div>
 
-    <div class="digital-clock" id="digitalClock"><span id="clkHms">--:--:--</span><span class="ms" id="clkMs"></span><span class="period" id="clkPeriod"></span></div>
+    <div class="digital-clock" id="digitalClock">
+      <span id="clkHms">--:--:--</span><span class="ms" id="clkMs"></span><span class="period" id="clkPeriod"></span>
+    </div>
     <div class="progress-bar-container" aria-hidden="true"><div class="progress-bar-fill" id="progressFill"></div></div>
     <div class="countdown" id="countdown">00</div>
 
     <div class="precision-clock" id="precisionClock">
-       <span id="precisionTime">--:--:--.---</span><span class="precision-period" id="precisionPeriod"></span>
+      <span id="precisionTime">--:--:--.---</span><span class="precision-period" id="precisionPeriod"></span>
     </div>
 
     <div class="sleek-status"><div class="sleek-details" id="sleekDetails"></div></div>
+
+    <!-- Studio Master + 5 Global Hubs -->
+    <div class="world-layout" id="worldLayout">
+      <div class="world-master">
+        <div class="world-master-header">
+          <span class="world-tally-badge" id="worldMasterBadge">MASTER STUDIO</span>
+          <span id="worldMasterZone">UTC</span>
+        </div>
+        <div class="world-master-time">
+          <span id="worldMasterHms">--:--:--</span><span class="w-ms" id="worldMasterMs">.---</span><span class="w-period" id="worldMasterPeriod"></span>
+        </div>
+        <div class="world-master-sub" id="worldMasterDate">—</div>
+      </div>
+      <div class="world-grid" id="worldGrid"></div>
+    </div>
 
     <div class="tz-label" id="tzLabel" aria-hidden="true"></div>
     <div class="bars-row" id="barsRow" aria-hidden="true"></div>
@@ -611,50 +734,44 @@
     <h2 data-i18n="settings">Settings</h2>
     <div class="setting-row">
       <label data-i18n="model">Model</label>
-      <select id="modelselect">
+      <select id="modelSelect">
         <option value="room-control" data-i18n="modelRoom">Room Control LED</option>
+        <option value="world"        data-i18n="modelWorld">Studio + 5 World</option>
         <option value="analog"       data-i18n="modelAnalog">Analog</option>
         <option value="sleek-analog" data-i18n="modelSleekAnalog">Sleek Analog</option>
         <option value="sleek"        data-i18n="modelSleek">Sleek</option>
-        <option value="big-display"  data-i18n="modelBigDisplay">Big Display</option>
-        <option value="neon"         data-i18n="modelNeon">Neon</option>
         <option value="bars"         data-i18n="modelBars">Bars</option>
-        <option value="minimal"      data-i18n="modelMinimal">Minimal</option>
-        <option value="modern"       data-i18n="modelModern">Modern</option>
-        <option value="matrix"       data-i18n="modelMatrix">Matrix</option>
-        <option value="terminal"     data-i18n="modelTerminal">Terminal</option>
-        <option value="hud"          data-i18n="modelHud">HUD</option>
+        <option value="big-display"  data-i18n="modelBigDisplay">Big Display</option>
       </select>
     </div>
     <div class="setting-row">
       <label data-i18n="theme">Theme</label>
       <select id="themeSelect">
-        <option value="classic">Classic</option>
-        <option value="cyan">Cyan</option>
-        <option value="amber">Amber</option>
-        <option value="mono">Mono</option>
-        <option value="vaporwave">Vaporwave</option>
-        <option value="matrix">Matrix</option>
+        <option value="classic">Broadcast Classic</option>
+        <option value="ebu">EBU / Tally Green</option>
+        <option value="amber">Playout Amber</option>
+        <option value="cyan">Telemetry Cyan</option>
+        <option value="mono">Studio Mono</option>
       </select>
     </div>
     <div class="setting-row">
       <label data-i18n="language">Language</label>
       <select id="languageSelect">
         <option value="en">English</option>
+        <option value="ro">Română</option>
         <option value="es">Español</option>
         <option value="fr">Français</option>
         <option value="de">Deutsch</option>
         <option value="it">Italiano</option>
-        <option value="zh">中文</option>
-        <option value="ru">Русский</option>
         <option value="pl">Polski</option>
         <option value="no">Norsk</option>
         <option value="da">Dansk</option>
-        <option value="ro">Română</option>
+        <option value="ru">Русский</option>
+        <option value="zh">中文</option>
       </select>
     </div>
     <div class="setting-row">
-      <label data-i18n="timezone">Timezone</label>
+      <label data-i18n="timezone">Studio Timezone</label>
       <select id="timezoneSelect">
         <option value="UTC">UTC</option>
         <option value="DEVICE" data-i18n="device">Device</option>
@@ -668,9 +785,15 @@
       </select>
     </div>
     <div class="setting-row pulse-row">
-      <label data-i18n="pulse">10s pulse</label>
+      <label data-i18n="pulse">10s tally pulse</label>
       <input type="checkbox" class="pulse-toggle" id="pulseToggle">
     </div>
+
+    <div class="world-settings-group" id="worldSettingsGroup" hidden>
+      <h3 data-i18n="worldHubs">World Clocks (5 Hubs)</h3>
+      <div id="worldHubSelects"></div>
+    </div>
+
     <button class="resync-button" id="resyncButton" type="button" data-i18n="resync">Resync now</button>
   </section>
 
@@ -689,173 +812,173 @@
 
     /* ═══ 1. CONFIG ═══════════════════════════════════════════ */
     const API_SAMPLES        = 5;
-    const API_SAMPLE_GAP_MS  = 120;
+    const API_SAMPLE_GAP_MS  = 110;
     const REQUEST_TIMEOUT_MS = 4000;
     const HEADER_SAMPLES     = 24;
     const GOOD_UNC_MS        = 150;
     const HEADER_MIN_AGREE   = 0.6;
     const RESYNC_OK_MS       = 10 * 60 * 1000;
     const RESYNC_WARN_MS     = 60 * 1000;
-    const WAKE_DRIFT_MS      = 250;     // clock drift tolerated after the tab/device wakes up
+    const WAKE_DRIFT_MS      = 250;
 
-    const models = ['room-control', 'analog', 'minimal', 'modern', 'neon', 'bars', 'matrix', 'terminal', 'hud', 'sleek', 'sleek-analog', 'big-display'];
-    const THEMES   = ['classic', 'cyan', 'amber', 'mono', 'vaporwave', 'matrix'];
-    const PROGRESS_models = new Set(['room-control', 'modern', 'neon']);
-    const ANALOG_models   = new Set(['analog', 'sleek-analog']);
+    const MODELS = ['room-control', 'world', 'analog', 'sleek-analog', 'sleek', 'bars', 'big-display'];
+    const THEMES = ['classic', 'ebu', 'amber', 'cyan', 'mono'];
+    const ANALOG_MODELS = new Set(['analog', 'sleek-analog']);
+    const DEFAULT_WORLD_ZONES = [
+      'UTC',
+      'Europe/London',
+      'America/New_York',
+      'Europe/Bucharest',
+      'Asia/Tokyo'
+    ];
 
-   
-
-/* ═══ 2. I18N ═════════════════════════════════════════════
-   Missing keys fall back to English (see t()).             */
-const I18N = {
-  en: { settings:'Settings', language:'Language', timezone:'Timezone', hourFormat:'Hour format', pulse:'10s pulse', device:'Device',
-        model:'Model', modelBigDisplay:'Big Display', modelRoom:'Room Control LED', modelAnalog:'Analog', modelMinimal:'Minimal', modelModern:'Modern',
-        modelNeon:'Neon', modelBars:'Bars', modelMatrix:'Matrix', modelTerminal:'Terminal', modelHud:'HUD',
-        modelSleek:'Sleek', modelSleekAnalog:'Sleek Analog', theme:'Theme',
-        resync:'Resync now',
-        searching:'Looking for time source…',
-        connecting:'Connecting to time source…',
-        receiving:'Receiving time data…',
-        calculating:'Calculating clock offset…',
-        syncing:'Resyncing…', synced:'Synced',
-        syncFailed:'Resync failed', noSource:'Time source unavailable', holdover:'holdover',
-        offset:'offset', rtt:'RTT', sources:'sources', precision:'accuracy', disagree:'Sources disagree',
-        source:'source', clockAhead:'device clock is', ahead:'ahead', behind:'behind', lastSync:'last sync' },
-
-  es: { settings:'Ajustes', language:'Idioma', timezone:'Zona horaria', hourFormat:'Formato hora', pulse:'Pulso 10s', device:'Dispositivo',
-        model:'Modelo', modelBigDisplay:'Pantalla grande', modelSleek:'Elegante', modelSleekAnalog:'Elegante analógico', modelAnalog:'Analógico', modelMinimal:'Mínimo', modelModern:'Moderno',
-        modelNeon:'Neón', modelBars:'Barras', modelTerminal:'Terminal', theme:'Tema',
-        resync:'Resincronizar ahora',
-        searching:'Buscando fuente de tiempo…',
-        connecting:'Conectando con la fuente de tiempo…',
-        receiving:'Recibiendo datos de tiempo…',
-        calculating:'Calculando la diferencia horaria…',
-        syncing:'Resincronizando…', synced:'Sincronizado',
-        syncFailed:'Resincronización fallida', noSource:'Fuente no disponible',
-        offset:'desfase', sources:'fuentes', precision:'precisión', disagree:'Fuentes en desacuerdo',
-        source:'fuente', clockAhead:'reloj del dispositivo está', ahead:'adelantado', behind:'atrasado', lastSync:'última sinc' },
-
-  fr: { settings:'Paramètres', language:'Langue', timezone:'Fuseau horaire', hourFormat:'Format heure', pulse:'Pulsation 10s', device:'Appareil',
-        model:'Modèle', modelBigDisplay:'Grand affichage', modelSleek:'Élégant', modelSleekAnalog:'Élégant analogique', modelAnalog:'Analogique', modelMinimal:'Minimal', modelModern:'Moderne',
-        modelNeon:'Néon', modelBars:'Barres', modelTerminal:'Terminal', theme:'Thème',
-        resync:'Resynchroniser',
-        searching:'Recherche source de temps…',
-        connecting:'Connexion à la source horaire…',
-        receiving:'Réception des données horaires…',
-        calculating:'Calcul de l’écart de l’horloge…',
-        syncing:'Resynchronisation…', synced:'Synchronisé',
-        syncFailed:'Resynchronisation échouée', noSource:'Source indisponible',
-        offset:'décalage', sources:'sources', precision:'précision', disagree:'Sources en désaccord',
-        source:'source', clockAhead:'horloge est', ahead:'en avance', behind:'en retard', lastSync:'dernière sync' },
-
-  de: { settings:'Einstellungen', language:'Sprache', timezone:'Zeitzone', hourFormat:'Zeitformat', pulse:'Puls 10s', device:'Gerät',
-        model:'Modell', modelBigDisplay:'Großanzeige', modelSleek:'Elegant', modelSleekAnalog:'Elegant analog', modelAnalog:'Analog', modelMinimal:'Minimal', modelModern:'Modern',
-        modelBars:'Balken', modelTerminal:'Terminal', theme:'Thema',
-        resync:'Jetzt synchronisieren',
-        searching:'Zeitquelle wird gesucht…',
-        connecting:'Verbindung zur Zeitquelle…',
-        receiving:'Zeitdaten werden empfangen…',
-        calculating:'Zeitabweichung wird berechnet…',
-        syncing:'Synchronisiere…', synced:'Synchronisiert',
-        syncFailed:'Synchronisierung fehlgeschlagen', noSource:'Zeitquelle nicht verfügbar',
-        offset:'Offset', sources:'Quellen', precision:'Genauigkeit', disagree:'Quellen widersprechen sich',
-        source:'Quelle', clockAhead:'Geräteuhr ist', ahead:'voraus', behind:'zurück', lastSync:'letzte Sync' },
-
-  it: { settings:'Impostazioni', language:'Lingua', timezone:'Fuso orario', hourFormat:'Formato ora', pulse:'Impulso 10s', device:'Dispositivo',
-        model:'Modello', modelBigDisplay:'Display grande', modelSleek:'Elegante', modelSleekAnalog:'Elegante analogico', modelAnalog:'Analogico', modelMinimal:'Minimal', modelModern:'Moderno',
-        modelBars:'Barre', modelTerminal:'Terminale', theme:'Tema',
-        resync:'Risincronizza ora',
-        searching:'Ricerca sorgente oraria…',
-        connecting:'Connessione alla sorgente oraria…',
-        receiving:'Ricezione dei dati orari…',
-        calculating:'Calcolo dello scarto dell’orologio…',
-        syncing:'Risincronizzazione…', synced:'Sincronizzato',
-        syncFailed:'Risincronizzazione fallita', noSource:'Sorgente non disponibile',
-        offset:'offset', sources:'sorgenti', precision:'precisione', disagree:'Sorgenti discordanti',
-        source:'sorgente', clockAhead:'orologio è', ahead:'avanti', behind:'indietro', lastSync:'ultima sinc' },
-
-  zh: { settings:'设置', language:'语言', timezone:'时区', hourFormat:'时间格式', pulse:'10 秒脉冲', device:'设备',
-        model:'样式', modelBigDisplay:'大屏', modelAnalog:'指针', modelMinimal:'极简', modelModern:'现代',
-        modelNeon:'霓虹', modelBars:'条状', modelMatrix:'矩阵', modelTerminal:'终端',
-        modelSleek:'时尚', modelSleekAnalog:'时尚指针', theme:'主题',
-        resync:'立即重新同步',
-        searching:'正在查找时间源…',
-        connecting:'正在连接时间源…',
-        receiving:'正在接收时间数据…',
-        calculating:'正在计算时钟偏差…',
-        syncing:'正在重新同步…', synced:'已同步',
-        syncFailed:'重新同步失败', noSource:'时间源不可用', holdover:'保持模式',
-        offset:'偏移', rtt:'往返延迟', sources:'来源', precision:'精度', disagree:'来源不一致',
-        source:'来源', clockAhead:'设备时钟', ahead:'快', behind:'慢', lastSync:'上次同步' },
-
-  ru: { settings:'Настройки', language:'Язык', timezone:'Часовой пояс', hourFormat:'Формат времени', pulse:'Импульс 10 с', device:'Устройство',
-        model:'Модель', modelBigDisplay:'Крупный дисплей', modelAnalog:'Аналоговые', modelMinimal:'Минимальный', modelModern:'Современный',
-        modelNeon:'Неон', modelBars:'Полосы', modelMatrix:'Матрица', modelTerminal:'Терминал',
-        modelSleek:'Стильный', modelSleekAnalog:'Стильные стрелки', theme:'Тема',
-        resync:'Синхронизировать сейчас',
-        searching:'Поиск источника времени…',
-        connecting:'Подключение к источнику времени…',
-        receiving:'Получение данных времени…',
-        calculating:'Расчёт смещения часов…',
-        syncing:'Синхронизация…', synced:'Синхронизировано',
-        syncFailed:'Ошибка синхронизации', noSource:'Источник времени недоступен', holdover:'удержание',
-        offset:'смещение', sources:'источников', precision:'точность', disagree:'Источники расходятся',
-        source:'источник', clockAhead:'часы устройства', ahead:'впереди', behind:'позади', lastSync:'последняя синх' },
-
-  pl: { settings:'Ustawienia', language:'Język', timezone:'Strefa czasowa', hourFormat:'Format czasu', pulse:'Puls 10 s', device:'Urządzenie',
-        model:'Model', modelBigDisplay:'Duży wyświetlacz', modelSleek:'Elegancki', modelSleekAnalog:'Elegancki analogowy', modelAnalog:'Analogowy', modelMinimal:'Minimalny', modelModern:'Nowoczesny',
-        modelBars:'Słupki', modelTerminal:'Terminal', theme:'Motyw',
-        resync:'Synchronizuj teraz',
-        searching:'Szukam źródła czasu…',
-        connecting:'Łączenie ze źródłem czasu…',
-        receiving:'Odbieranie danych czasu…',
-        calculating:'Obliczanie przesunięcia zegara…',
-        syncing:'Synchronizacja…', synced:'Zsynchronizowano',
-        syncFailed:'Synchronizacja nie powiodła się', noSource:'Źródło czasu niedostępne', holdover:'podtrzymanie',
-        offset:'przesunięcie', sources:'źródeł', precision:'dokładność', disagree:'Źródła niezgodne',
-        source:'źródło', clockAhead:'zegar urządzenia jest', ahead:'do przodu', behind:'do tyłu', lastSync:'ostatnia synchronizacja' },
-
-  no: { settings:'Innstillinger', language:'Språk', timezone:'Tidssone', hourFormat:'Tidsformat', pulse:'10 s puls', device:'Enhet',
-        model:'Modell', modelBigDisplay:'Stor skjerm', modelSleek:'Elegant', modelSleekAnalog:'Elegant analogt', modelAnalog:'Analogt', modelMinimal:'Minimalistisk', modelModern:'Moderne',
-        modelBars:'Søyler', modelTerminal:'Terminal', theme:'Tema',
-        resync:'Synkroniser nå',
-        searching:'Leter etter tidskilde…',
-        connecting:'Kobler til tidskilde…',
-        receiving:'Mottar tidsdata…',
-        calculating:'Beregner klokkeavvik…',
-        syncing:'Synkroniserer…', synced:'Synkronisert',
-        syncFailed:'Synkronisering mislyktes', noSource:'Tidskilde utilgjengelig',
-        offset:'forskyvning', sources:'kilder', precision:'nøyaktighet', disagree:'Kilder er uenige',
-        source:'kilde', clockAhead:'klokken er', ahead:'foran', behind:'bak', lastSync:'siste synk' },
-
-  da: { settings:'Indstillinger', language:'Sprog', timezone:'Tidszone', hourFormat:'Tidsformat', pulse:'10 s puls', device:'Enhed',
-        model:'Model', modelBigDisplay:'Stor skærm', modelSleek:'Elegant', modelSleekAnalog:'Elegant analogt', modelAnalog:'Analogt', modelMinimal:'Minimalistisk', modelModern:'Moderne',
-        modelBars:'Søjler', modelTerminal:'Terminal', theme:'Tema',
-        resync:'Synkroniser nu',
-        searching:'Søger efter tidskilde…',
-        connecting:'Opretter forbindelse til tidskilde…',
-        receiving:'Modtager tidsdata…',
-        calculating:'Beregner urafvigelse…',
-        syncing:'Synkroniserer…', synced:'Synkroniseret',
-        syncFailed:'Synkronisering mislykkedes', noSource:'Tidskilde utilgængelig',
-        offset:'forskydning', sources:'kilder', precision:'nøjagtighed', disagree:'Kilder er uenige',
-        source:'kilde', clockAhead:'uret er', ahead:'foran', behind:'bagud', lastSync:'sidste synk' },
-
-  ro: { settings:'Setări', language:'Limbă', timezone:'Fus orar', hourFormat:'Format oră', pulse:'Pulsație 10s', device:'Dispozitiv',
-        model:'Model', modelBigDisplay:'Afișaj mare', modelAnalog:'Analogic', modelMinimal:'Minimal', modelModern:'Modern',
-        modelBars:'Bare', modelTerminal:'Terminal', modelSleekAnalog:'Sleek Analogic', theme:'Temă',
-        resync:'Resincronizează acum',
-        searching:'Se caută sursă de timp…',
-        connecting:'Conectare la sursa de timp…',
-        receiving:'Se primesc datele de timp…',
-        calculating:'Se calculează diferența de timp…',
-        syncing:'Se resincronizează…', synced:'Sincronizat',
-        syncFailed:'Resincronizare eșuată', noSource:'Sursă indisponibilă',
-        offset:'offset', sources:'surse', precision:'precizie', disagree:'Surse în dezacord',
-        source:'sursa', clockAhead:'ceasul PC-ului este', ahead:'înainte', behind:'înapoi', lastSync:'ultima sincronizare' }
-};
-const LANG_ALIASES = { nb: 'no', nn: 'no' };
-
+    /* ═══ 2. I18N ═════════════════════════════════════════════ */
+    const I18N = {
+      en: {
+        settings: 'Settings', language: 'Language', timezone: 'Studio Timezone', hourFormat: 'Hour format',
+        pulse: '10s tally pulse', device: 'Device', model: 'Model', theme: 'Theme',
+        modelRoom: 'Room Control LED', modelWorld: 'Studio + 5 World', modelAnalog: 'Analog',
+        modelSleekAnalog: 'Sleek Analog', modelSleek: 'Sleek', modelBars: 'Bars', modelBigDisplay: 'Big Display',
+        worldHubs: 'World Clocks (5 Hubs)', masterStudio: 'MASTER STUDIO', sameTz: 'STUDIO TZ',
+        resync: 'Resync now', searching: 'Looking for time source…', connecting: 'Connecting to time source…',
+        receiving: 'Receiving time data…', calculating: 'Calculating clock offset…',
+        syncing: 'Resyncing…', synced: 'Locked', syncFailed: 'Resync failed',
+        noSource: 'Time source unavailable', holdover: 'holdover', offset: 'offset', rtt: 'RTT',
+        sources: 'sources', precision: 'accuracy', disagree: 'Sources disagree',
+        source: 'source', clockAhead: 'device clock is', ahead: 'ahead', behind: 'behind', lastSync: 'last sync'
+      },
+      ro: {
+        settings: 'Setări', language: 'Limbă', timezone: 'Fus orar studio', hourFormat: 'Format oră',
+        pulse: 'Puls tally 10s', device: 'Dispozitiv', model: 'Model', theme: 'Temă',
+        modelRoom: 'Room Control LED', modelWorld: 'Studio + 5 Glob', modelAnalog: 'Analogic',
+        modelSleekAnalog: 'Sleek Analogic', modelSleek: 'Sleek', modelBars: 'Bare', modelBigDisplay: 'Afișaj mare',
+        worldHubs: 'Ceasuri Globale (5 Fusuri)', masterStudio: 'STUDIO PRINCIPAL', sameTz: 'ORA STUDIO',
+        resync: 'Resincronizează acum', searching: 'Căutare sursă de timp…', connecting: 'Conectare la sursa de timp…',
+        receiving: 'Recepție date de timp…', calculating: 'Calculare offset ceas…',
+        syncing: 'Resincronizare…', synced: 'Sincronizat', syncFailed: 'Resincronizare eșuată',
+        noSource: 'Sursă indisponibilă', holdover: 'holdover', offset: 'offset', rtt: 'RTT',
+        sources: 'surse', precision: 'precizie', disagree: 'Surse în dezacord',
+        source: 'sursă', clockAhead: 'ceasul sistemului este', ahead: 'înainte', behind: 'înapoi', lastSync: 'ultima sinc'
+      },
+      es: {
+        settings: 'Ajustes', language: 'Idioma', timezone: 'Zona horaria estudio', hourFormat: 'Formato hora',
+        pulse: 'Pulso tally 10s', device: 'Dispositivo', model: 'Modelo', theme: 'Tema',
+        modelRoom: 'Room Control LED', modelWorld: 'Estudio + 5 Mundial', modelAnalog: 'Analógico',
+        modelSleekAnalog: 'Elegante analógico', modelSleek: 'Elegante', modelBars: 'Barras', modelBigDisplay: 'Pantalla grande',
+        worldHubs: 'Relojes Mundiales (5 Zonas)', masterStudio: 'ESTUDIO PRINCIPAL', sameTz: 'HORA ESTUDIO',
+        resync: 'Resincronizar ahora', searching: 'Buscando fuente de tiempo…', connecting: 'Conectando con fuente…',
+        receiving: 'Recibiendo datos…', calculating: 'Calculando desfase…',
+        syncing: 'Resincronizando…', synced: 'Sincronizado', syncFailed: 'Fallo al resincronizar',
+        noSource: 'Fuente no disponible', holdover: 'holdover', offset: 'desfase', rtt: 'RTT',
+        sources: 'fuentes', precision: 'precisión', disagree: 'Fuentes en desacuerdo',
+        source: 'fuente', clockAhead: 'reloj del sistema está', ahead: 'adelantado', behind: 'atrasado', lastSync: 'última sinc'
+      },
+      fr: {
+        settings: 'Paramètres', language: 'Langue', timezone: 'Fuseau studio', hourFormat: 'Format heure',
+        pulse: 'Pulsation tally 10s', device: 'Appareil', model: 'Modèle', theme: 'Thème',
+        modelRoom: 'Room Control LED', modelWorld: 'Studio + 5 Monde', modelAnalog: 'Analogique',
+        modelSleekAnalog: 'Élégant analogique', modelSleek: 'Élégant', modelBars: 'Barres', modelBigDisplay: 'Grand affichage',
+        worldHubs: 'Horloges Mondiales (5)', masterStudio: 'STUDIO PRINCIPAL', sameTz: 'HEURE STUDIO',
+        resync: 'Resynchroniser', searching: 'Recherche source…', connecting: 'Connexion…',
+        receiving: 'Réception des données…', calculating: 'Calcul de l’écart…',
+        syncing: 'Resynchronisation…', synced: 'Verrouillé', syncFailed: 'Échec resync',
+        noSource: 'Source indisponible', holdover: 'holdover', offset: 'décalage', rtt: 'RTT',
+        sources: 'sources', precision: 'précision', disagree: 'Sources en désaccord',
+        source: 'source', clockAhead: 'horloge système est', ahead: 'en avance', behind: 'en retard', lastSync: 'dernière sync'
+      },
+      de: {
+        settings: 'Einstellungen', language: 'Sprache', timezone: 'Studio-Zeitzone', hourFormat: 'Zeitformat',
+        pulse: '10s Tally-Puls', device: 'Gerät', model: 'Modell', theme: 'Thema',
+        modelRoom: 'Room Control LED', modelWorld: 'Studio + 5 Weltzeit', modelAnalog: 'Analog',
+        modelSleekAnalog: 'Elegant analog', modelSleek: 'Elegant', modelBars: 'Balken', modelBigDisplay: 'Großanzeige',
+        worldHubs: 'Weltuhren (5 Zonen)', masterStudio: 'HAUPTSTUDIO', sameTz: 'STUDIOZEIT',
+        resync: 'Jetzt synchronisieren', searching: 'Zeitquelle suchen…', connecting: 'Verbinden…',
+        receiving: 'Zeitdaten empfangen…', calculating: 'Offset berechnen…',
+        syncing: 'Synchronisiere…', synced: 'Synchronisiert', syncFailed: 'Sync fehlgeschlagen',
+        noSource: 'Quelle nicht verfügbar', holdover: 'Holdover', offset: 'Offset', rtt: 'RTT',
+        sources: 'Quellen', precision: 'Genauigkeit', disagree: 'Quellen weichen ab',
+        source: 'Quelle', clockAhead: 'Systemuhr ist', ahead: 'voraus', behind: 'zurück', lastSync: 'letzte Sync'
+      },
+      it: {
+        settings: 'Impostazioni', language: 'Lingua', timezone: 'Fuso orario studio', hourFormat: 'Formato ora',
+        pulse: 'Impulso tally 10s', device: 'Dispositivo', model: 'Modello', theme: 'Tema',
+        modelRoom: 'Room Control LED', modelWorld: 'Studio + 5 Mondo', modelAnalog: 'Analogico',
+        modelSleekAnalog: 'Elegante analogico', modelSleek: 'Elegante', modelBars: 'Barre', modelBigDisplay: 'Display grande',
+        worldHubs: 'Orologi Mondiali (5)', masterStudio: 'STUDIO PRINCIPALE', sameTz: 'ORA STUDIO',
+        resync: 'Risincronizza ora', searching: 'Ricerca sorgente…', connecting: 'Connessione…',
+        receiving: 'Ricezione dati…', calculating: 'Calcolo scarto…',
+        syncing: 'Risincronizzazione…', synced: 'Sincronizzato', syncFailed: 'Errore sync',
+        noSource: 'Sorgente non disponibile', holdover: 'holdover', offset: 'offset', rtt: 'RTT',
+        sources: 'sorgenti', precision: 'precisione', disagree: 'Sorgenti discordanti',
+        source: 'sorgente', clockAhead: 'orologio di sistema è', ahead: 'avanti', behind: 'indietro', lastSync: 'ultima sinc'
+      },
+      pl: {
+        settings: 'Ustawienia', language: 'Język', timezone: 'Strefa studia', hourFormat: 'Format czasu',
+        pulse: 'Puls tally 10s', device: 'Urządzenie', model: 'Model', theme: 'Motyw',
+        modelRoom: 'Room Control LED', modelWorld: 'Studio + 5 Świat', modelAnalog: 'Analogowy',
+        modelSleekAnalog: 'Elegancki analogowy', modelSleek: 'Elegancki', modelBars: 'Słupki', modelBigDisplay: 'Duży wyświetlacz',
+        worldHubs: 'Zegary Światowe (5)', masterStudio: 'STUDIO GŁÓWNE', sameTz: 'CZAS STUDIA',
+        resync: 'Synchronizuj teraz', searching: 'Szukam źródła…', connecting: 'Łączenie…',
+        receiving: 'Odbieranie danych…', calculating: 'Obliczanie przesunięcia…',
+        syncing: 'Synchronizacja…', synced: 'Zsynchronizowano', syncFailed: 'Błąd synchronizacji',
+        noSource: 'Źródło niedostępne', holdover: 'holdover', offset: 'przesunięcie', rtt: 'RTT',
+        sources: 'źródeł', precision: 'dokładność', disagree: 'Źródła niezgodne',
+        source: 'źródło', clockAhead: 'zegar urządzenia jest', ahead: 'do przodu', behind: 'do tyłu', lastSync: 'ostatnia sync'
+      },
+      no: {
+        settings: 'Innstillinger', language: 'Språk', timezone: 'Studiotidssone', hourFormat: 'Tidsformat',
+        pulse: '10s tally-puls', device: 'Enhet', model: 'Modell', theme: 'Tema',
+        modelRoom: 'Room Control LED', modelWorld: 'Studio + 5 Verden', modelAnalog: 'Analogt',
+        modelSleekAnalog: 'Elegant analogt', modelSleek: 'Elegant', modelBars: 'Søyler', modelBigDisplay: 'Stor skjerm',
+        worldHubs: 'Verdensklokker (5)', masterStudio: 'HOVEDSTUDIO', sameTz: 'STUDIOTID',
+        resync: 'Synkroniser nå', searching: 'Leter etter tidskilde…', connecting: 'Kobler til…',
+        receiving: 'Mottar tidsdata…', calculating: 'Beregner avvik…',
+        syncing: 'Synkroniserer…', synced: 'Synkronisert', syncFailed: 'Synkronisering mislyktes',
+        noSource: 'Tidskilde utilgjengelig', holdover: 'holdover', offset: 'forskyvning', rtt: 'RTT',
+        sources: 'kilder', precision: 'nøyaktighet', disagree: 'Kilder er uenige',
+        source: 'kilde', clockAhead: 'klokken er', ahead: 'foran', behind: 'bak', lastSync: 'siste synk'
+      },
+      da: {
+        settings: 'Indstillinger', language: 'Sprog', timezone: 'Studietidszone', hourFormat: 'Tidsformat',
+        pulse: '10s tally-puls', device: 'Enhed', model: 'Model', theme: 'Tema',
+        modelRoom: 'Room Control LED', modelWorld: 'Studie + 5 Verden', modelAnalog: 'Analogt',
+        modelSleekAnalog: 'Elegant analogt', modelSleek: 'Elegant', modelBars: 'Søjler', modelBigDisplay: 'Stor skærm',
+        worldHubs: 'Verdensure (5)', masterStudio: 'HOVEDSTUDIE', sameTz: 'STUDIETID',
+        resync: 'Synkroniser nu', searching: 'Søger efter tidskilde…', connecting: 'Forbinder…',
+        receiving: 'Modtager tidsdata…', calculating: 'Beregner afvigelse…',
+        syncing: 'Synkroniserer…', synced: 'Synkroniseret', syncFailed: 'Synkronisering mislykkedes',
+        noSource: 'Tidskilde utilgængelig', holdover: 'holdover', offset: 'forskydning', rtt: 'RTT',
+        sources: 'kilder', precision: 'nøjagtighed', disagree: 'Kilder er uenige',
+        source: 'kilde', clockAhead: 'uret er', ahead: 'foran', behind: 'bagud', lastSync: 'sidste synk'
+      },
+      ru: {
+        settings: 'Настройки', language: 'Язык', timezone: 'Часовой пояс студии', hourFormat: 'Формат времени',
+        pulse: 'Импульс tally 10с', device: 'Устройство', model: 'Модель', theme: 'Тема',
+        modelRoom: 'Room Control LED', modelWorld: 'Студия + 5 Мировых', modelAnalog: 'Аналоговые',
+        modelSleekAnalog: 'Стильные стрелки', modelSleek: 'Стильный', modelBars: 'Полосы', modelBigDisplay: 'Крупный дисплей',
+        worldHubs: 'Мировое время (5 зон)', masterStudio: 'ГЛАВНАЯ СТУДИЯ', sameTz: 'ВРЕМЯ СТУДИИ',
+        resync: 'Синхронизировать сейчас', searching: 'Поиск источника…', connecting: 'Подключение…',
+        receiving: 'Получение данных…', calculating: 'Расчёт смещения…',
+        syncing: 'Синхронизация…', synced: 'Синхронизировано', syncFailed: 'Ошибка синхронизации',
+        noSource: 'Источник недоступен', holdover: 'holdover', offset: 'смещение', rtt: 'RTT',
+        sources: 'источников', precision: 'точность', disagree: 'Источники расходятся',
+        source: 'источник', clockAhead: 'часы системы', ahead: 'впереди', behind: 'позади', lastSync: 'последняя синх'
+      },
+      zh: {
+        settings: '设置', language: '语言', timezone: '演播室时区', hourFormat: '时间格式',
+        pulse: '10秒提示脉冲', device: '设备', model: '样式', theme: '主题',
+        modelRoom: 'Room Control LED', modelWorld: '演播室 + 5世界时钟', modelAnalog: '指针',
+        modelSleekAnalog: '时尚指针', modelSleek: '时尚', modelBars: '条状', modelBigDisplay: '大屏',
+        worldHubs: '世界时钟 (5个地区)', masterStudio: '主演播室', sameTz: '同演播室',
+        resync: '立即重新同步', searching: '查找时间源…', connecting: '连接时间源…',
+        receiving: '接收时间数据…', calculating: '计算时钟偏差…',
+        syncing: '重新同步中…', synced: '已锁定', syncFailed: '同步失败',
+        noSource: '时间源不可用', holdover: '保持模式', offset: '偏移', rtt: 'RTT',
+        sources: '来源', precision: '精度', disagree: '来源不一致',
+        source: '来源', clockAhead: '系统时钟', ahead: '快', behind: '慢', lastSync: '上次同步'
+      }
+    };
+    const LANG_ALIASES = { nb: 'no', nn: 'no' };
 
     /* ═══ 3. HELPERS ══════════════════════════════════════════ */
     const $ = id => document.getElementById(id);
@@ -864,7 +987,7 @@ const LANG_ALIASES = { nb: 'no', nn: 'no' };
 
     const store = {
       get(key, fallback) { try { const v = localStorage.getItem(key); return v === null ? fallback : v; } catch { return fallback; } },
-      set(key, value)    { try { localStorage.setItem(key, value); } catch { /* private mode / blocked */ } }
+      set(key, value)    { try { localStorage.setItem(key, value); } catch {} }
     };
 
     function detectLanguage() {
@@ -878,71 +1001,126 @@ const LANG_ALIASES = { nb: 'no', nn: 'no' };
       return 'en';
     }
 
+    function loadWorldZones() {
+      try {
+        const raw = store.get('masterclock-world-zones', '');
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length === 5) return parsed;
+      } catch {}
+      return [...DEFAULT_WORLD_ZONES];
+    }
+
+    function cityLabel(zoneId) {
+      if (zoneId === 'UTC') return 'UTC';
+      const parts = zoneId.split('/');
+      return parts[parts.length - 1].replace(/_/g, ' ');
+    }
+
+    function getZoneOffsetMinutes(zoneId, dateObj) {
+      if (zoneId === 'UTC') return 0;
+      const dtf = new Intl.DateTimeFormat('en-US', {
+        timeZone: zoneId,
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+        hour12: false
+      });
+      const parts = {};
+      for (const p of dtf.formatToParts(dateObj)) parts[p.type] = p.value;
+      const asUtc = Date.UTC(
+        Number(parts.year),
+        Number(parts.month) - 1,
+        Number(parts.day),
+        Number(parts.hour) % 24,
+        Number(parts.minute),
+        Number(parts.second)
+      );
+      return Math.round((asUtc - dateObj.getTime()) / 60000);
+    }
+
+    function formatRelativeOffset(diffMinutes) {
+      if (diffMinutes === 0) return t('sameTz');
+      const sign = diffMinutes > 0 ? '+' : '−';
+      const abs = Math.abs(diffMinutes);
+      const h = Math.floor(abs / 60);
+      const m = abs % 60;
+      return m ? `${sign}${h}h${String(m).padStart(2, '0')}` : `${sign}${h}h`;
+    }
+
     /* ═══ 4. DOM REFERENCES ═══════════════════════════════════ */
-    const circle         = $('circle');
-    const clkHms         = $('clkHms');
-    const clkMs          = $('clkMs');
-    const clkPeriod      = $('clkPeriod');
-    const digitalClock   = $('digitalClock');
-    const digitalDate    = $('digitalDate');
-    const countdown      = $('countdown');
-    const progressFill   = $('progressFill');
-    const precisionClock = $('precisionClock');
-    const tzLabel        = $('tzLabel');
-    const hourHandEl     = $('hourHand');
-    const minuteHandEl   = $('minuteHand');
-    const secondHandEl   = $('secondHand');
-    const barsRow        = $('barsRow');
-    const matrixCanvas   = $('matrixCanvas');
-    const sleekDetails   = $('sleekDetails');
-    const precisionTime   = $('precisionTime');
-    const precisionPeriod = $('precisionPeriod');
+    const circle             = $('circle');
+    const clkHms             = $('clkHms');
+    const clkMs              = $('clkMs');
+    const clkPeriod          = $('clkPeriod');
+    const digitalClock       = $('digitalClock');
+    const digitalDate        = $('digitalDate');
+    const countdown          = $('countdown');
+    const progressFill       = $('progressFill');
+    const tzLabel            = $('tzLabel');
+    const hourHandEl         = $('hourHand');
+    const minuteHandEl       = $('minuteHand');
+    const secondHandEl       = $('secondHand');
+    const barsRow            = $('barsRow');
+    const sleekDetails       = $('sleekDetails');
+    const precisionTime      = $('precisionTime');
+    const precisionPeriod    = $('precisionPeriod');
 
-    const settingsPanel    = $('settingsPanel');
-    const settingsButton   = $('settingsButton');
-    const modelselect    = $('modelselect');
-    const themeSelect      = $('themeSelect');
-    const languageSelect   = $('languageSelect');
-    const timezoneSelect   = $('timezoneSelect');
-    const hourFormatSelect = $('hourFormatSelect');
-    const pulseToggle      = $('pulseToggle');
-    const resyncButton     = $('resyncButton');
+    const worldMasterBadge   = $('worldMasterBadge');
+    const worldMasterZone    = $('worldMasterZone');
+    const worldMasterHms     = $('worldMasterHms');
+    const worldMasterMs      = $('worldMasterMs');
+    const worldMasterPeriod  = $('worldMasterPeriod');
+    const worldMasterDate    = $('worldMasterDate');
+    const worldGrid          = $('worldGrid');
+    const worldSettingsGroup = $('worldSettingsGroup');
+    const worldHubSelects    = $('worldHubSelects');
 
-    const syncDot       = $('syncDot');
-    const syncText      = $('syncText');
-    const offsetMetric  = $('offsetMetric');
-    const precMetric    = $('precMetric');
-    const rttMetric     = $('rttMetric');
-    const divider       = $('divider');
-    const statusMetrics = $('statusMetrics');
+    const settingsPanel      = $('settingsPanel');
+    const settingsButton     = $('settingsButton');
+    const modelSelect        = $('modelSelect');
+    const themeSelect        = $('themeSelect');
+    const languageSelect     = $('languageSelect');
+    const timezoneSelect     = $('timezoneSelect');
+    const hourFormatSelect   = $('hourFormatSelect');
+    const pulseToggle        = $('pulseToggle');
+    const resyncButton       = $('resyncButton');
+
+    const syncDot            = $('syncDot');
+    const syncText           = $('syncText');
+    const offsetMetric       = $('offsetMetric');
+    const precMetric         = $('precMetric');
+    const rttMetric          = $('rttMetric');
+    const divider            = $('divider');
+    const statusMetrics      = $('statusMetrics');
 
     /* ═══ 5. STATE ════════════════════════════════════════════ */
     let language     = detectLanguage();
     let selectedZone = store.get('masterclock-timezone', 'UTC');
     let hourFormat   = store.get('masterclock-hourformat', '24');
     let pulseEnabled = store.get('masterclock-pulse', 'true') !== 'false';
-    let model      = store.get('masterclock-model', 'room-control');
+    let model        = store.get('masterclock-model', 'room-control');
     let theme        = store.get('masterclock-theme', 'classic');
-    if (!models.includes(model)) model = 'room-control';
-    if (!THEMES.includes(theme))     theme   = 'classic';
+    let worldZones   = loadWorldZones();
 
-    // Sync
-    let targetOffset   = null;   // true UTC (ms) − performance.now()
-    let deviceOffsetMs = null;   // true UTC − Date.now() at sync time (>0 → device is behind)
+    if (!MODELS.includes(model)) model = 'room-control';
+    if (!THEMES.includes(theme)) theme = 'classic';
+
+    let targetOffset   = null;
+    let deviceOffsetMs = null;
     let lastRtt        = null;
     let lastUnc        = null;
     let lastSyncMono   = null;
     let syncing        = false;
     let syncTimer      = 0;
-    let syncState      = { kind:'', key:'searching', extra:'' };
+    let syncState      = { kind: '', key: 'searching', extra: '' };
 
-    // Rendering
     let tz = zone();
     let fmtTime = null, fmtDate = null;
-    let lastEpochSec = -1;       // last whole second rendered; reset by invalidate()
+    let worldFormatters = [];
+    let worldCardsDom = [];
+    let lastEpochSec = -1;
     let lastDateText = '';
-    let clk = null;              // cached values of the current second
-    let themeColors = { green:'#0FFF50', amber:'#ff9100', red:'#ff3131' };
+    let clk = null;
+    let themeColors = { green: '#00e676', amber: '#ffab00', red: '#ff1744' };
 
     const secondLeds = [];
     const hourLeds   = [];
@@ -955,41 +1133,62 @@ const LANG_ALIASES = { nb: 'no', nn: 'no' };
     function refreshThemeColors() {
       const s = getComputedStyle(document.documentElement);
       themeColors = {
-        green: s.getPropertyValue('--green').trim() || '#0FFF50',
-        amber: s.getPropertyValue('--amber').trim() || '#ff9100',
-        red:   s.getPropertyValue('--red').trim()   || '#ff3131'
+        green: s.getPropertyValue('--green').trim() || '#00e676',
+        amber: s.getPropertyValue('--amber').trim() || '#ffab00',
+        red:   s.getPropertyValue('--red').trim()   || '#ff1744'
       };
     }
+
     function applyTheme() {
       document.documentElement.dataset.theme = theme;
       refreshThemeColors();
       invalidate();
     }
-    function applymodel() {
-      circle.classList.remove(...models.map(v => 'model-' + v));
+
+    function applyModel() {
+      circle.classList.remove(...MODELS.map(v => 'model-' + v));
       circle.classList.add('model-' + model);
+      worldSettingsGroup.hidden = model !== 'world';
       invalidate();
     }
+
     function applyI18n() {
       document.documentElement.lang = language;
       document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
       settingsButton.setAttribute('aria-label', t('settings'));
+      worldMasterBadge.textContent = t('masterStudio');
       updateStatusDisplay();
       updateMetrics();
     }
+
     function zone() {
       return selectedZone === 'DEVICE' ? Intl.DateTimeFormat().resolvedOptions().timeZone : selectedZone;
     }
-    /* Formatters depend on timezone, language and hour format only —
-       they are rebuilt when one of those changes, never per frame. */
+
     function rebuildFormatters() {
       tz = zone();
-      const timeOpts = { timeZone: tz, hour:'2-digit', minute:'2-digit', second:'2-digit' };
+      const timeOpts = { timeZone: tz, hour: '2-digit', minute: '2-digit', second: '2-digit' };
       if (hourFormat === '12') timeOpts.hour12 = true; else timeOpts.hourCycle = 'h23';
       fmtTime = new Intl.DateTimeFormat('en-GB', timeOpts);
-      fmtDate = new Intl.DateTimeFormat(language, { timeZone: tz, weekday:'long', day:'2-digit', month:'2-digit', year:'numeric' });
-      tzLabel.textContent = tz.replace(/_/g, ' ');
+      fmtDate = new Intl.DateTimeFormat(language, {
+        timeZone: tz, weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric'
+      });
+
+      const cleanTz = tz.replace(/_/g, ' ');
+      tzLabel.textContent = cleanTz;
+      worldMasterZone.textContent = cleanTz;
       digitalClock.classList.toggle('h12', hourFormat === '12');
+
+      worldFormatters = worldZones.map(wz => {
+        const opts = { timeZone: wz, hour: '2-digit', minute: '2-digit', second: '2-digit' };
+        if (hourFormat === '12') opts.hour12 = true; else opts.hourCycle = 'h23';
+        return new Intl.DateTimeFormat('en-GB', opts);
+      });
+
+      worldCardsDom.forEach((card, idx) => {
+        card.city.textContent = cityLabel(worldZones[idx]);
+      });
+
       updateSleekDetails();
       invalidate();
     }
@@ -999,28 +1198,29 @@ const LANG_ALIASES = { nb: 'no', nn: 'no' };
       syncState = { kind, key, extra };
       updateStatusDisplay();
     }
+
     function updateStatusDisplay() {
       syncDot.className = syncState.kind;
       syncText.textContent = t(syncState.key) + (syncState.extra ? ' · ' + syncState.extra : '');
       updateSleekDetails();
     }
+
     function updateSleekDetails() {
       if (deviceOffsetMs === null || lastUnc === null) {
         sleekDetails.innerHTML = `<span>${t(syncState.key)}</span>`;
         return;
       }
-      // deviceOffsetMs > 0 means true time is ahead of the device → the device is behind.
       const dir  = deviceOffsetMs >= 0 ? t('behind') : t('ahead');
       const off  = `${Math.round(Math.abs(deviceOffsetMs))} ms ${dir}`;
       const prec = `±${Math.round(lastUnc)} ms`;
       const when = new Date(performance.timeOrigin + lastSyncMono)
-        .toLocaleTimeString(language, { hour:'2-digit', minute:'2-digit', second:'2-digit' });
+        .toLocaleTimeString(language, { hour: '2-digit', minute: '2-digit', second: '2-digit' });
       sleekDetails.innerHTML =
         `${t('source')}: <span>${syncState.extra || '—'}</span> · ${t('precision')} <span>${prec}</span><br>` +
-        `${t('clockAhead')} <span>${off}</span><br>` +
-        `${t('lastSync')}: <span>${when}</span><br>` +
+        `${t('clockAhead')} <span>${off}</span> · ${t('lastSync')}: <span>${when}</span><br>` +
         `${t('timezone')}: <span>${tz.replace(/_/g, ' ')}</span>`;
     }
+
     function updateMetrics() {
       const show = deviceOffsetMs !== null && lastUnc !== null;
       divider.hidden       = !show;
@@ -1043,12 +1243,16 @@ const LANG_ALIASES = { nb: 'no', nn: 'no' };
 
     /* ═══ 8. TIME SYNC ════════════════════════════════════════ */
     const API_SOURCES = [
-      { name: 'timeapi.io',
+      {
+        name: 'timeapi.io',
         url: 'https://timeapi.io/api/time/current/zone?timeZone=UTC',
-        parse: j => Date.parse(trunc3(j.dateTime) + 'Z') },
-      { name: 'worldtimeapi.org',
+        parse: j => Date.parse(trunc3(j.dateTime) + 'Z')
+      },
+      {
+        name: 'worldtimeapi.org',
         url: 'https://worldtimeapi.org/api/timezone/Etc/UTC',
-        parse: j => Date.parse(trunc3(j.utc_datetime)) }
+        parse: j => Date.parse(trunc3(j.utc_datetime))
+      }
     ];
 
     async function syncApi(src) {
@@ -1067,7 +1271,7 @@ const LANG_ALIASES = { nb: 'no', nn: 'no' };
           const rtt = t1 - t0;
           const s = { offset: srv - (t0 + rtt / 2), rttMin: rtt, unc: rtt / 2 + 1 };
           if (!best || s.unc < best.unc) best = s;
-        } catch { /* try next sample */ }
+        } catch {}
         finally { clearTimeout(to); }
         if (i < API_SAMPLES - 1) await sleep(API_SAMPLE_GAP_MS);
       }
@@ -1109,8 +1313,8 @@ const LANG_ALIASES = { nb: 'no', nn: 'no' };
             const D = Date.parse(d);
             if (Number.isFinite(D)) iv.push([D - recvMono, D + 1000 - sendMono]);
           }
-        } catch { /* try next sample */ }
-        await sleep(130 + Math.random() * 40);
+        } catch {}
+        await sleep(120 + Math.random() * 40);
       }
       if (iv.length < 3) throw new Error('no Date header');
       const m = marzullo(iv);
@@ -1123,88 +1327,66 @@ const LANG_ALIASES = { nb: 'no', nn: 'no' };
       syncTimer = setTimeout(synchronize, syncState.kind === 'ok' ? RESYNC_OK_MS : RESYNC_WARN_MS);
     }
 
+    async function synchronize() {
+      if (syncing) return;
+      syncing = true;
+      resyncButton.disabled = true;
+      setSync('busy', 'connecting');
 
-async function synchronize() {
-  if (syncing) return;
-  syncing = true;
-  resyncButton.disabled = true;
+      const results = [];
+      for (const src of API_SOURCES) {
+        setSync('busy', 'receiving', src.name);
+        try {
+          results.push(Object.assign(await syncApi(src), { name: src.name }));
+        } catch {}
+      }
 
-  const nextPaint = () =>
-    new Promise(resolve => requestAnimationFrame(resolve));
+      let res = null, label = '', agree = null;
 
-  const showStage = async (kind, key, extra = '') => {
-    setSync(kind, key, extra);
-    await nextPaint();
-    await new Promise(resolve => setTimeout(resolve, 400));
-  };
+      if (results.length) {
+        setSync('busy', 'calculating');
+        results.sort((a, b) => a.unc - b.unc);
+        res = results[0];
+        label = res.name;
 
-  await showStage('busy', 'connecting');
+        if (results.length > 1) {
+          agree = results.slice(1).every(b => Math.abs(res.offset - b.offset) <= res.unc + b.unc);
+          if (agree) label = `${results.length} ${t('sources')}`;
+        }
+      } else if (canUseHeaderFallback()) {
+        setSync('busy', 'receiving', 'HTTP Date');
+        try {
+          res = await syncDateHeader();
+          label = 'HTTP Date';
+        } catch {}
+      }
 
-  const results = [];
+      if (res) {
+        const now = performance.now();
+        targetOffset   = res.offset;
+        lastRtt        = res.rttMin;
+        lastUnc        = res.unc;
+        lastSyncMono   = now;
+        deviceOffsetMs = (now + res.offset) - Date.now();
 
-  for (const src of API_SOURCES) {
-    await showStage('busy', 'receiving', src.name);
+        if (agree === false) setSync('warn', 'disagree', label);
+        else setSync(res.unc < GOOD_UNC_MS ? 'ok' : 'warn', 'synced', label);
 
-    try {
-      results.push(Object.assign(await syncApi(src), { name: src.name }));
-    } catch {
-      /* source down */
+        updateMetrics();
+      } else {
+        setSync(
+          targetOffset === null ? 'bad' : 'warn',
+          targetOffset === null ? 'noSource' : 'syncFailed',
+          targetOffset === null ? '' : t('holdover')
+        );
+      }
+
+      scheduleNextSync();
+      syncing = false;
+      resyncButton.disabled = false;
     }
-  }
 
-  let res = null, label = '', agree = null;
-
-  if (results.length) {
-    await showStage('busy', 'calculating');
-
-    results.sort((a, b) => a.unc - b.unc);
-    res = results[0];
-    label = res.name;
-
-    if (results.length > 1) {
-      agree = results.slice(1).every(
-        b => Math.abs(res.offset - b.offset) <= res.unc + b.unc
-      );
-      if (agree) label = `${results.length} ${t('sources')}`;
-    }
-
-  } else if (canUseHeaderFallback()) {
-    await showStage('busy', 'receiving', 'HTTP Date');
-
-    try {
-      res = await syncDateHeader();
-      label = 'HTTP Date';
-    } catch {
-      /* no fallback either */
-    }
-  }
-
-  if (res) {
-    const now = performance.now();
-    targetOffset   = res.offset;
-    lastRtt        = res.rttMin;
-    lastUnc        = res.unc;
-    lastSyncMono   = now;
-    deviceOffsetMs = (now + res.offset) - Date.now();
-
-    if (agree === false) setSync('warn', 'disagree', label);
-    else setSync(res.unc < GOOD_UNC_MS ? 'ok' : 'warn', 'synced', label);
-
-    updateMetrics();
-
-  } else {
-    setSync(targetOffset === null ? 'bad' : 'warn',
-            targetOffset === null ? 'noSource' : 'syncFailed',
-            targetOffset === null ? '' : t('holdover'));
-  }
-
-  scheduleNextSync();
-  syncing = false;
-  resyncButton.disabled = false;
-}
-
-
-    /* ═══ 9. DOM BUILD (LEDs, bars) ═══════════════════════════ */
+    /* ═══ 9. DOM BUILD (LEDs, Bars, World Cards) ══════════════ */
     function addLeds(count, radius, cssClass, target) {
       const frag = document.createDocumentFragment();
       for (let i = 0; i < count; i++) {
@@ -1221,39 +1403,32 @@ async function synchronize() {
       circle.appendChild(frag);
     }
 
-    /* ═══ 10. MATRIX RAIN ═════════════════════════════════════ */
-    let matrixCtx = null, matrixCols = 0, matrixDrops = [], matrixFontSize = 14;
+    function buildWorldCards() {
+      const frag = document.createDocumentFragment();
+      for (let i = 0; i < 5; i++) {
+        const card = document.createElement('div');
+        card.className = 'world-card';
 
-    function resizeMatrix() {
-      const w = matrixCanvas.clientWidth, h = matrixCanvas.clientHeight;
-      if (!w || !h || (matrixCanvas.width === w && matrixCanvas.height === h)) return;
-      matrixCanvas.width = w;
-      matrixCanvas.height = h;
-      matrixCtx = matrixCanvas.getContext('2d');
-      matrixFontSize = Math.max(10, Math.floor(w / 45));
-      matrixCols = Math.ceil(w / matrixFontSize);
-      matrixDrops = Array.from({ length: matrixCols }, () => Math.random() * (h / matrixFontSize));
-      matrixCtx.fillStyle = '#000';
-      matrixCtx.fillRect(0, 0, w, h);
-    }
+        const city = document.createElement('div');
+        city.className = 'world-card-city';
+        city.textContent = cityLabel(worldZones[i]);
 
-    function drawMatrixRain(color) {
-      if (!matrixCtx || !matrixCols) return;
-      const w = matrixCanvas.width, h = matrixCanvas.height, fs = matrixFontSize;
-      matrixCtx.fillStyle = 'rgba(0, 0, 0, 0.09)';
-      matrixCtx.fillRect(0, 0, w, h);
-      matrixCtx.font = fs + 'px monospace';
-      matrixCtx.fillStyle = color;
-      for (let i = 0; i < matrixCols; i++) {
-        const y = matrixDrops[i] * fs;
-        matrixCtx.fillText(String(Math.floor(Math.random() * 10)), i * fs, y);
-        if (y > h && Math.random() > 0.975) matrixDrops[i] = 0; else matrixDrops[i]++;
+        const time = document.createElement('div');
+        time.className = 'world-card-time';
+        time.textContent = '--:--:--';
+
+        const meta = document.createElement('div');
+        meta.className = 'world-card-meta';
+        meta.textContent = 'UTC';
+
+        card.append(city, time, meta);
+        frag.appendChild(card);
+        worldCardsDom.push({ city, time, meta });
       }
+      worldGrid.appendChild(frag);
     }
 
-    /* ═══ 11. RENDER LOOP ═════════════════════════════════════
-       Per second  → text, date, countdown, colours, LEDs/bars
-       Per frame   → milliseconds, progress, analog hands, rain  */
+    /* ═══ 10. RENDER LOOP ═════════════════════════════════════ */
     function onSecond(epochSec) {
       const date = new Date(epochSec * 1000);
       const p = {};
@@ -1273,19 +1448,45 @@ async function synchronize() {
       clkPeriod.textContent = clk.suffix;
 
       const dateText = fmtDate.format(date);
-      if (dateText !== lastDateText) { digitalDate.textContent = dateText; lastDateText = dateText; }
+      if (dateText !== lastDateText) {
+        digitalDate.textContent = dateText;
+        worldMasterDate.textContent = dateText;
+        lastDateText = dateText;
+      }
 
       countdown.textContent = String((60 - sec) % 60).padStart(2, '0');
       countdown.style.color = clk.color;
       progressFill.style.backgroundColor = clk.color;
-      if (model === 'modern') circle.style.setProperty('--modern-color', clk.color);
+
+      if (model === 'world') {
+        worldMasterHms.textContent = clk.hms;
+        worldMasterPeriod.textContent = clk.suffix;
+        const studioOffsetMin = getZoneOffsetMinutes(tz, date);
+
+        for (let i = 0; i < 5; i++) {
+          const wz = worldZones[i];
+          const wp = {};
+          for (const part of worldFormatters[i].formatToParts(date)) wp[part.type] = part.value;
+          const suf = wp.dayPeriod ? ` ${wp.dayPeriod.toUpperCase()}` : '';
+          worldCardsDom[i].time.textContent = `${wp.hour}:${wp.minute}:${wp.second}${suf}`;
+
+          const hubOffsetMin = getZoneOffsetMinutes(wz, date);
+          const relDiff = hubOffsetMin - studioOffsetMin;
+          const utcHours = hubOffsetMin / 60;
+          const utcStr = utcHours === 0 ? 'UTC' : `UTC${utcHours > 0 ? '+' : '−'}${Math.abs(utcHours)}`;
+          worldCardsDom[i].meta.textContent = `${formatRelativeOffset(relDiff)} · ${utcStr}`;
+        }
+      }
 
       updateIndicators(sec);
     }
 
     function updateIndicators(sec) {
-      if (ANALOG_models.has(model)) {
-        secondLeds.forEach((led, i) => { led.classList.toggle('on', i === sec); led.classList.remove('pulse-last10'); });
+      if (ANALOG_MODELS.has(model)) {
+        secondLeds.forEach((led, i) => {
+          led.classList.toggle('on', i === sec);
+          led.classList.remove('pulse-last10');
+        });
         hourLeds.forEach((led, i) => led.classList.toggle('on', i === clk.h12));
       } else if (model === 'room-control') {
         secondLeds.forEach((led, i) => {
@@ -1296,52 +1497,47 @@ async function synchronize() {
         const litHours = Math.floor(sec / 5);
         hourLeds.forEach((led, i) => led.classList.toggle('on', i <= litHours));
       } else if (model === 'bars') {
-        bars.forEach((bar, i) => bar.classList.toggle('on', i <= sec));
+        bars.forEach((bar, i) => {
+          bar.classList.toggle('on', i <= sec);
+          bar.classList.toggle('last10', pulseEnabled && sec >= 50 && i >= 50);
+        });
       }
     }
 
     function render() {
       requestAnimationFrame(render);
+      if (targetOffset === null) return;
 
-      if (targetOffset === null) {
-        if (model === 'matrix') drawMatrixRain(themeColors.green);
-        return;
-      }
-
-      const now    = performance.now();
-      const utcMs  = now + targetOffset;
-      const epoch  = Math.floor(utcMs / 1000);
+      const now   = performance.now();
+      const utcMs = now + targetOffset;
+      const epoch = Math.floor(utcMs / 1000);
       if (epoch !== lastEpochSec) { lastEpochSec = epoch; onSecond(epoch); }
 
       const ms     = Math.floor(utcMs - epoch * 1000);
       const msText = String(ms).padStart(3, '0');
       const s      = clk.sec + ms / 1000;
 
-      if (model === 'sleek') {clkMs.textContent = '.' + msText;
-           } else {
-          precisionTime.textContent = `${clk.hms}.${msText}`;
-          precisionPeriod.textContent = clk.suffix;
-        }
-
-      if (PROGRESS_models.has(model)) {
-        const progress = s / 60;
-        progressFill.style.width = `${progress * 100}%`;
-        if (model === 'modern') circle.style.setProperty('--progress-deg', `${progress * 360}deg`);
+      if (model === 'sleek') {
+        clkMs.textContent = '.' + msText;
+      } else if (model === 'world') {
+        worldMasterMs.textContent = '.' + msText;
+      } else {
+        precisionTime.textContent = `${clk.hms}.${msText}`;
+        precisionPeriod.textContent = clk.suffix;
       }
 
-      if (ANALOG_models.has(model)) {
+      if (model === 'room-control') {
+        progressFill.style.width = `${(s / 60) * 100}%`;
+      }
+
+      if (ANALOG_MODELS.has(model)) {
         hourHandEl.style.transform   = `rotate(${(clk.h12 + clk.min / 60) * 30}deg)`;
         minuteHandEl.style.transform = `rotate(${(clk.min + s / 60) * 6}deg)`;
         secondHandEl.style.transform = `rotate(${s * 6}deg)`;
       }
-
-      if (model === 'matrix') {
-        const flash = pulseEnabled && clk.sec >= 50 && (Math.floor(now / 500) % 2 === 0);
-        drawMatrixRain(flash ? themeColors.red : themeColors.green);
-      }
     }
 
-    /* ═══ 12. INIT & EVENTS ═══════════════════════════════════ */
+    /* ═══ 11. INIT & EVENTS ═══════════════════════════════════ */
     const zones = Intl.supportedValuesOf ? Intl.supportedValuesOf('timeZone') : [];
     for (const z of zones) {
       if (z === 'UTC') continue;
@@ -1351,15 +1547,50 @@ async function synchronize() {
     }
     if (selectedZone !== 'UTC' && selectedZone !== 'DEVICE' && !zones.includes(selectedZone)) selectedZone = 'UTC';
 
+    // Populate 5 World Hub selectors in Settings
+    for (let i = 0; i < 5; i++) {
+      const row = document.createElement('div');
+      row.className = 'setting-row';
+      const lbl = document.createElement('label');
+      lbl.textContent = `Hub ${i + 1}`;
+      const sel = document.createElement('select');
+
+      const utcOpt = document.createElement('option');
+      utcOpt.value = utcOpt.textContent = 'UTC';
+      sel.appendChild(utcOpt);
+
+      for (const z of zones) {
+        if (z === 'UTC') continue;
+        const opt = document.createElement('option');
+        opt.value = z;
+        opt.textContent = z.replace(/_/g, ' ');
+        sel.appendChild(opt);
+      }
+
+      if (!zones.includes(worldZones[i]) && worldZones[i] !== 'UTC') worldZones[i] = DEFAULT_WORLD_ZONES[i];
+      sel.value = worldZones[i];
+
+      sel.addEventListener('change', () => {
+        worldZones[i] = sel.value;
+        store.set('masterclock-world-zones', JSON.stringify(worldZones));
+        rebuildFormatters();
+      });
+
+      row.append(lbl, sel);
+      worldHubSelects.appendChild(row);
+    }
+
     timezoneSelect.value   = selectedZone;
     languageSelect.value   = language;
     hourFormatSelect.value = hourFormat;
     pulseToggle.checked    = pulseEnabled;
-    modelselect.value    = model;
+    modelSelect.value      = model;
     themeSelect.value      = theme;
 
     addLeds(60, 40, 'led', secondLeds);
     addLeds(12, 47, 'hour-led', hourLeds);
+    buildWorldCards();
+
     {
       const frag = document.createDocumentFragment();
       for (let i = 0; i < 60; i++) {
@@ -1372,11 +1603,9 @@ async function synchronize() {
     }
 
     applyTheme();
-    applymodel();
+    applyModel();
     rebuildFormatters();
     applyI18n();
-
-    new ResizeObserver(resizeMatrix).observe(matrixCanvas);
 
     function setPanel(open) {
       settingsPanel.hidden = !open;
@@ -1388,10 +1617,10 @@ async function synchronize() {
     });
     document.addEventListener('keydown', e => { if (e.key === 'Escape') setPanel(false); });
 
-    modelselect.addEventListener('change', () => {
-      model = modelselect.value;
+    modelSelect.addEventListener('change', () => {
+      model = modelSelect.value;
       store.set('masterclock-model', model);
-      applymodel();
+      applyModel();
     });
     themeSelect.addEventListener('change', () => {
       theme = themeSelect.value;
@@ -1421,7 +1650,6 @@ async function synchronize() {
     });
     resyncButton.addEventListener('click', () => synchronize());
 
-    // After sleep / long background, performance.now() may have stopped while Date.now() kept going.
     document.addEventListener('visibilitychange', () => {
       if (document.hidden || targetOffset === null || syncing) return;
       const drift = (performance.now() + targetOffset) - Date.now() - deviceOffsetMs;
