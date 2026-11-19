@@ -2,108 +2,92 @@
 
 **A browser-based synchronized clock for studios, control rooms and live production environments.**
 
-<img width="1920" height="1080" alt="MasterClock Lite" src="https://github.com/user-attachments/assets/40874a4f-273a-42bf-bd37-e183e5c74ceb" />
+<img width="1933" height="1080" alt="image" src="https://github.com/user-attachments/assets/8b02f8fe-7903-4321-a847-2c54c9b3c98d" />
 
 MasterClock Lite is a lightweight, standalone HTML clock designed for environments where a clear and reliable time reference is essential.
 
-Unlike a conventional clock that simply displays the computer's system time, MasterClock Lite attempts to synchronize its internal time reference with external UTC time services. It estimates the difference between the device clock and external time sources, then uses that offset to maintain a continuously updated display.
+Unlike a conventional clock that simply displays the computer's system time, MasterClock Lite synchronizes its internal time reference with external UTC time services. It estimates the difference between the local device clock and external sources, then uses that offset alongside the browser's monotonic clock to maintain a continuous, accurate display.
 
-The application runs entirely in the browser, without requiring a dedicated server, backend or additional software installation.
+The application runs entirely in the browser in a single HTML file, without requiring a dedicated server, backend, build step, or additional software installation.
 
 ## Features
 
 - **External Time Synchronization** – Retrieves UTC time from external services and calculates the offset relative to the local device clock.
-- **Multiple Time Sources** – Uses independent time services to compare synchronization results and assess their agreement.
-- **HTTP Date Fallback** – If the primary time services are unavailable, the application can attempt synchronization using the HTTP `Date` response header of the hosting server.
-- **Continuous Timekeeping** – Uses the browser's monotonic performance clock to advance synchronized time between synchronization cycles.
-- **Automatic Resynchronization** – Periodically checks the external time reference and updates synchronization status.
-- **Manual Resynchronization** – Allows the user to initiate a new synchronization at any time.
-- **Precision Display** – Displays milliseconds alongside the standard clock.
-- **Synchronization Monitoring** – Provides information about clock offset, estimated uncertainty, network round-trip time (RTT) and synchronization status.
-- **Timezone Selection** – Supports UTC and available system time zones.
-- **Multilingual Interface** – Includes localized interface labels and status messages.
-- **Responsive Interface** – Adapts to different screen sizes and display environments.
-- **Persistent Settings** – Saves user preferences locally in the browser using `localStorage`.
+- **Multi-Source Verification** – Queries independent time services to compare synchronization results and verify agreement.
+- **HTTP Date Fallback** – If the primary time APIs are unreachable, the application falls back to sampling the HTTP `Date` response header using interval intersection (Marzullo's algorithm).
+- **Continuous Monotonic Timekeeping** – Advances synchronized time using `performance.now()`, keeping the display stable even if the system clock changes between sync cycles.
+- **Wake & Drift Detection** – Automatically triggers a resynchronization if clock drift is detected after system sleep or background throttling.
+- **Automatic & Manual Resynchronization** – Periodically refreshes the time reference in the background and allows manual resync at any time.
+- **Millisecond Precision** – Displays real-time milliseconds alongside standard hours, minutes, and seconds.
+- **Synchronization Telemetry** – Reports clock offset, estimated uncertainty, network round-trip time (RTT), active source, and lock/holdover status.
+- **Multi-Zone & World Time Support** – Supports UTC, local device time, standard IANA time zones, and simultaneous monitoring of five configurable global time hubs with relative offsets.
+- **Multilingual Interface** – Automatically detects browser language and supports 11 languages (`EN`, `ES`, `FR`, `DE`, `IT`, `PL`, `NO`, `DA`, `RU`, `ZH`, `RO`).
+- **Responsive & Persistent** – Adapts cleanly to control room monitors, desktops, and mobile screens, saving all preferences locally via `localStorage`.
 
 ## Time Synchronization
 
-MasterClock Lite uses a lightweight, client-side synchronization mechanism.
+MasterClock Lite uses a lightweight, client-side synchronization mechanism:
 
-The synchronization process includes:
+1. Sends multiple requests to external UTC time services, measuring round-trip timing via `performance.now()`.
+2. Selects the sample with the lowest estimated uncertainty (`RTT / 2 + 1 ms`).
+3. Cross-checks independent sources when multiple services respond to verify consistency.
+4. Computes an offset between true UTC and the browser's monotonic clock.
+5. Maintains the displayed time independently of the operating system clock.
 
-1. Requests UTC time from external time services.
-2. Measures request duration using `performance.now()`.
-3. Takes multiple samples and selects the sample with the lowest estimated uncertainty.
-4. Compares independent sources when more than one is available.
-5. Calculates an offset between external time and the local monotonic clock.
-6. Uses the calculated offset to maintain the displayed time independently of subsequent changes to the computer's system clock.
-
-When the primary services cannot be reached, the application can attempt an alternative synchronization method using the HTTP `Date` response header.
-
-If synchronization is temporarily unavailable, the clock continues using its last valid reference (holdover), provided that an earlier synchronization was successful.
+When external APIs are unavailable, the application can derive time from repeated HTTP `Date` headers using interval consensus. If all network sources become temporarily unreachable after an initial lock, the clock enters **holdover** mode and continues running from its last valid offset.
 
 ## Synchronization Status
 
-The status indicator provides useful diagnostic information:
+The status bar provides real-time diagnostic feedback:
 
-- **Synchronized** – A valid external time reference has been obtained.
-- **Warning** – Synchronization quality is reduced or external sources disagree.
-- **Holdover** – The application continues using the last successful synchronization.
-- **Unavailable** – No valid time reference could be obtained.
+- **Locked / Synchronized** – A valid external time reference has been acquired within normal uncertainty thresholds.
+- **Warning** – Synchronization uncertainty is elevated, sources disagree, or the clock is running in holdover mode.
+- **Unavailable** – No external time reference could be obtained yet.
 
-Additional metrics include:
+Displayed telemetry includes:
 
-- Clock offset relative to the device clock.
-- Estimated synchronization uncertainty.
-- Network round-trip time (RTT), when available.
-- External time source information.
+- **Offset** – Difference between the external reference and the local device clock (`ms`).
+- **Accuracy** – Estimated synchronization uncertainty (`±ms`).
+- **RTT** – Minimum measured network round-trip time (`ms`), when available from API sources.
 
 ## Configuration
 
 The settings panel allows users to customize:
 
-- Display appearance.
-- Color theme.
-- Interface language.
-- Timezone.
-- 12-hour or 24-hour time format.
-- Final-ten-second visual pulse.
-- Manual synchronization.
+- Studio / primary timezone (`UTC`, `Device`, or any IANA timezone)
+- Five global hub timezones for multi-location monitoring
+- Interface language
+- 12-hour (`AM / PM`) or 24-hour time format
+- Final-ten-second visual tally pulse
+- Manual resynchronization
 
-Preferences are stored locally in the browser and do not require an account.
+All preferences are stored locally in the browser (`localStorage`) and require no account or external configuration.
 
 ## Browser Application
 
 **[Open MasterClock Lite](https://lojewskistudio.github.io/MasterClock-Lite/)**
 
-MasterClock Lite runs directly in your browser. No installation, downloads or additional configuration required.
-
-Internet access is required for external time synchronization.
+MasterClock Lite runs directly in your browser. No installation, downloads, or server setup required. Internet access is required for external time synchronization.
 
 ## Technical Details
 
-- HTML5
-- CSS3
-- Vanilla JavaScript
-- Browser Fetch API
-- Performance API (`performance.now()`)
-- Internationalization API (`Intl.DateTimeFormat`)
-- Canvas API
-- Local Storage
+- HTML5 & CSS3 (Container Queries, CSS Custom Properties, Grid/Flexbox)
+- Vanilla JavaScript (ES6+)
+- Fetch API & `AbortController`
+- High Resolution Time API (`performance.now()`, `performance.timeOrigin`)
+- Internationalization API (`Intl.DateTimeFormat`, `Intl.supportedValuesOf`)
+- `requestAnimationFrame` rendering loop
+- Web Storage API (`localStorage`)
 
-No external JavaScript libraries or frameworks are required.
+Zero external dependencies or frameworks.
 
 ## Important Notes
 
-MasterClock Lite is a browser-based time reference, not a certified precision timekeeping instrument.
+MasterClock Lite is a browser-based time reference, not a certified precision timekeeping instrument (such as a hardware PTP/NTP master clock or GPSDO).
 
-Its actual accuracy depends on network latency, external service availability, server response timestamps, browser execution and the hosting environment.
+Actual accuracy depends on network latency, path asymmetry, external service availability, browser timer resolution, and the hosting environment. The displayed uncertainty is an estimate derived from network sampling rather than a guaranteed specification.
 
-The displayed synchronization uncertainty is an estimate based on the sampling method, not a guaranteed accuracy specification.
-
-The application does not modify or synchronize the operating system clock. It maintains its own adjusted time reference within the browser.
-
-For professional broadcast or mission-critical timing applications, independent verification against a trusted reference is recommended.
+The application does not modify the operating system clock; it maintains an independent time reference inside the browser tab. For mission-critical broadcast or playout operations, independent verification against a primary station reference is recommended.
 
 ## License
 
