@@ -110,7 +110,7 @@
       --red: #ff2e4c;
       --precis: #64748b;
       --tz: #e0e0e0;
-      --sig: #bdbdbd;
+      --sig: #c0bcff;
       --hour-on: #cbd5e1;
       --hour-off: #1e293b;
       --sec-off: #3b1219;
@@ -368,7 +368,7 @@
     }
     .sleek-details span { color: var(--green); font-weight: 500; }
 
-    /* World Hubs Layout (Studio Master + 5 Global Clocks) */
+    /* World Hubs Layout (Studio Master + 6 Global Clocks) */
     .world-layout {
       position: absolute;
       inset: 0;
@@ -437,7 +437,7 @@
     }
     .world-grid {
       display: grid;
-      grid-template-columns: repeat(5, 1fr);
+      grid-template-columns: repeat(6, minmax(0, 1fr));
       gap: clamp(8px, 1.5cqmin, 14px);
     }
     .world-card {
@@ -457,7 +457,7 @@
       overflow: hidden;
       text-overflow: ellipsis;
       white-space: nowrap;
-      font-size: clamp(.62rem, 1.65cqmin, .88rem);
+      font-size: clamp(.72rem, 1.75cqmin, .98rem);
       font-weight: 600;
       color: var(--amber);
       text-transform: uppercase;
@@ -472,7 +472,7 @@
       white-space: nowrap;
     }
     .world-card-meta {
-      font-size: clamp(.55rem, 1.35cqmin, .75rem);
+      font-size: clamp(.75rem, 1.65cqmin, .95rem);
       color: var(--precis);
       white-space: nowrap;
     }
@@ -668,12 +668,21 @@
         width: 94vw;
         height: calc(100dvh - var(--chrome));
       }
+      #circle.model-world .world-master { flex: 0 0 30%; min-height: 0; }
+      #circle.model-world .world-layout { gap: 8px; padding: 10px; }
+
       .world-grid {
-        grid-template-columns: repeat(2, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-rows: repeat(3, minmax(0, 1fr));
+        flex: 1 1 auto;
+        min-height: 0;
       }
-      .world-grid .world-card:last-child {
-        grid-column: span 2;
+      .world-card {
+        min-height: 0;
+        padding: 5px 4px;
       }
+      .world-card-time { font-size: clamp(.85rem, 3.1cqmin, 1.35rem); }
+      .world-card-meta { font-size: clamp(.48rem, 1.35cqmin, .68rem); }
     }
     @media (max-width: 600px) {
       :root { --chrome: 86px; --hour-hand-w: 4px; --min-hand-w: 3px; --sec-hand-w: 1.5px; }
@@ -736,7 +745,7 @@
       <label data-i18n="model">Model</label>
       <select id="modelSelect">
         <option value="room-control" data-i18n="modelRoom">Room Control LED</option>
-        <option value="world"        data-i18n="modelWorld">Studio + 5 World</option>
+        <option value="world"        data-i18n="modelWorld">Studio + 6 World</option>
         <option value="analog"       data-i18n="modelAnalog">Analog</option>
         <option value="sleek-analog" data-i18n="modelSleekAnalog">Sleek Analog</option>
         <option value="sleek"        data-i18n="modelSleek">Sleek</option>
@@ -790,7 +799,7 @@
     </div>
 
     <div class="world-settings-group" id="worldSettingsGroup" hidden>
-      <h3 data-i18n="worldHubs">World Clocks (5 Hubs)</h3>
+      <h3 data-i18n="worldHubs">World Clocks (6 Hubs)</h3>
       <div id="worldHubSelects"></div>
     </div>
 
@@ -829,7 +838,8 @@
       'Europe/London',
       'America/New_York',
       'Europe/Bucharest',
-      'Asia/Tokyo'
+      'Asia/Tokyo',
+      'Australia/Sydney'
     ];
 
     /* ═══ 2. I18N ═════════════════════════════════════════════ */
@@ -837,9 +847,9 @@
       en: {
         settings: 'Settings', language: 'Language', timezone: 'Studio Timezone', hourFormat: 'Hour format',
         pulse: '10s tally pulse', device: 'Device', model: 'Model', theme: 'Theme',
-        modelRoom: 'Room Control LED', modelWorld: 'Studio + 5 World', modelAnalog: 'Analog',
+        modelRoom: 'Room Control LED', modelWorld: 'Studio + 6 World', modelAnalog: 'Analog',
         modelSleekAnalog: 'Sleek Analog', modelSleek: 'Sleek', modelBars: 'Bars', modelBigDisplay: 'Big Display',
-        worldHubs: 'World Clocks (5 Hubs)', masterStudio: 'MASTER STUDIO', sameTz: 'STUDIO TZ',
+        worldHubs: 'World Clocks (6 Hubs)', masterStudio: 'MASTER STUDIO', sameTz: 'STUDIO TZ',
         resync: 'Resync now', searching: 'Looking for time source…', connecting: 'Connecting to time source…',
         receiving: 'Receiving time data…', calculating: 'Calculating clock offset…',
         syncing: 'Resyncing…', synced: 'Locked', syncFailed: 'Resync failed',
@@ -850,9 +860,9 @@
       es: {
         settings: 'Ajustes', language: 'Idioma', timezone: 'Zona horaria estudio', hourFormat: 'Formato hora',
         pulse: 'Pulso tally 10s', device: 'Dispositivo', model: 'Modelo', theme: 'Tema',
-        modelRoom: 'Room Control LED', modelWorld: 'Estudio + 5 Mundial', modelAnalog: 'Analógico',
+        modelRoom: 'Room Control LED', modelWorld: 'Estudio + 6 Mundial', modelAnalog: 'Analógico',
         modelSleekAnalog: 'Elegante analógico', modelSleek: 'Elegante', modelBars: 'Barras', modelBigDisplay: 'Pantalla grande',
-        worldHubs: 'Relojes Mundiales (5 Zonas)', masterStudio: 'ESTUDIO PRINCIPAL', sameTz: 'HORA ESTUDIO',
+        worldHubs: 'Relojes Mundiales (6 Zonas)', masterStudio: 'ESTUDIO PRINCIPAL', sameTz: 'HORA ESTUDIO',
         resync: 'Resincronizar ahora', searching: 'Buscando fuente de tiempo…', connecting: 'Conectando con fuente…',
         receiving: 'Recibiendo datos…', calculating: 'Calculando desfase…',
         syncing: 'Resincronizando…', synced: 'Sincronizado', syncFailed: 'Fallo al resincronizar',
@@ -863,9 +873,9 @@
       fr: {
         settings: 'Paramètres', language: 'Langue', timezone: 'Fuseau studio', hourFormat: 'Format heure',
         pulse: 'Pulsation tally 10s', device: 'Appareil', model: 'Modèle', theme: 'Thème',
-        modelRoom: 'Room Control LED', modelWorld: 'Studio + 5 Monde', modelAnalog: 'Analogique',
+        modelRoom: 'Room Control LED', modelWorld: 'Studio + 6 Monde', modelAnalog: 'Analogique',
         modelSleekAnalog: 'Élégant analogique', modelSleek: 'Élégant', modelBars: 'Barres', modelBigDisplay: 'Grand affichage',
-        worldHubs: 'Horloges Mondiales (5)', masterStudio: 'STUDIO PRINCIPAL', sameTz: 'HEURE STUDIO',
+        worldHubs: 'Horloges Mondiales (6)', masterStudio: 'STUDIO PRINCIPAL', sameTz: 'HEURE STUDIO',
         resync: 'Resynchroniser', searching: 'Recherche source…', connecting: 'Connexion…',
         receiving: 'Réception des données…', calculating: 'Calcul de l’écart…',
         syncing: 'Resynchronisation…', synced: 'Verrouillé', syncFailed: 'Échec resync',
@@ -876,9 +886,9 @@
       de: {
         settings: 'Einstellungen', language: 'Sprache', timezone: 'Studio-Zeitzone', hourFormat: 'Zeitformat',
         pulse: '10s Tally-Puls', device: 'Gerät', model: 'Modell', theme: 'Thema',
-        modelRoom: 'Room Control LED', modelWorld: 'Studio + 5 Weltzeit', modelAnalog: 'Analog',
+        modelRoom: 'Room Control LED', modelWorld: 'Studio + 6 Weltzeit', modelAnalog: 'Analog',
         modelSleekAnalog: 'Elegant analog', modelSleek: 'Elegant', modelBars: 'Balken', modelBigDisplay: 'Großanzeige',
-        worldHubs: 'Weltuhren (5 Zonen)', masterStudio: 'HAUPTSTUDIO', sameTz: 'STUDIOZEIT',
+        worldHubs: 'Weltuhren (6 Zonen)', masterStudio: 'HAUPTSTUDIO', sameTz: 'STUDIOZEIT',
         resync: 'Jetzt synchronisieren', searching: 'Zeitquelle suchen…', connecting: 'Verbinden…',
         receiving: 'Zeitdaten empfangen…', calculating: 'Offset berechnen…',
         syncing: 'Synchronisiere…', synced: 'Synchronisiert', syncFailed: 'Sync fehlgeschlagen',
@@ -889,9 +899,9 @@
       it: {
         settings: 'Impostazioni', language: 'Lingua', timezone: 'Fuso orario studio', hourFormat: 'Formato ora',
         pulse: 'Impulso tally 10s', device: 'Dispositivo', model: 'Modello', theme: 'Tema',
-        modelRoom: 'Room Control LED', modelWorld: 'Studio + 5 Mondo', modelAnalog: 'Analogico',
+        modelRoom: 'Room Control LED', modelWorld: 'Studio + 6 Mondo', modelAnalog: 'Analogico',
         modelSleekAnalog: 'Elegante analogico', modelSleek: 'Elegante', modelBars: 'Barre', modelBigDisplay: 'Display grande',
-        worldHubs: 'Orologi Mondiali (5)', masterStudio: 'STUDIO PRINCIPALE', sameTz: 'ORA STUDIO',
+        worldHubs: 'Orologi Mondiali (6)', masterStudio: 'STUDIO PRINCIPALE', sameTz: 'ORA STUDIO',
         resync: 'Risincronizza ora', searching: 'Ricerca sorgente…', connecting: 'Connessione…',
         receiving: 'Ricezione dati…', calculating: 'Calcolo scarto…',
         syncing: 'Risincronizzazione…', synced: 'Sincronizzato', syncFailed: 'Errore sync',
@@ -902,9 +912,9 @@
       pl: {
         settings: 'Ustawienia', language: 'Język', timezone: 'Strefa studia', hourFormat: 'Format czasu',
         pulse: 'Puls tally 10s', device: 'Urządzenie', model: 'Model', theme: 'Motyw',
-        modelRoom: 'Room Control LED', modelWorld: 'Studio + 5 Świat', modelAnalog: 'Analogowy',
+        modelRoom: 'Room Control LED', modelWorld: 'Studio + 6 Świat', modelAnalog: 'Analogowy',
         modelSleekAnalog: 'Elegancki analogowy', modelSleek: 'Elegancki', modelBars: 'Słupki', modelBigDisplay: 'Duży wyświetlacz',
-        worldHubs: 'Zegary Światowe (5)', masterStudio: 'STUDIO GŁÓWNE', sameTz: 'CZAS STUDIA',
+        worldHubs: 'Zegary Światowe (6)', masterStudio: 'STUDIO GŁÓWNE', sameTz: 'CZAS STUDIA',
         resync: 'Synchronizuj teraz', searching: 'Szukam źródła…', connecting: 'Łączenie…',
         receiving: 'Odbieranie danych…', calculating: 'Obliczanie przesunięcia…',
         syncing: 'Synchronizacja…', synced: 'Zsynchronizowano', syncFailed: 'Błąd synchronizacji',
@@ -915,9 +925,9 @@
       no: {
         settings: 'Innstillinger', language: 'Språk', timezone: 'Studiotidssone', hourFormat: 'Tidsformat',
         pulse: '10s tally-puls', device: 'Enhet', model: 'Modell', theme: 'Tema',
-        modelRoom: 'Room Control LED', modelWorld: 'Studio + 5 Verden', modelAnalog: 'Analogt',
+        modelRoom: 'Room Control LED', modelWorld: 'Studio + 6 Verden', modelAnalog: 'Analogt',
         modelSleekAnalog: 'Elegant analogt', modelSleek: 'Elegant', modelBars: 'Søyler', modelBigDisplay: 'Stor skjerm',
-        worldHubs: 'Verdensklokker (5)', masterStudio: 'HOVEDSTUDIO', sameTz: 'STUDIOTID',
+        worldHubs: 'Verdensklokker (6)', masterStudio: 'HOVEDSTUDIO', sameTz: 'STUDIOTID',
         resync: 'Synkroniser nå', searching: 'Leter etter tidskilde…', connecting: 'Kobler til…',
         receiving: 'Mottar tidsdata…', calculating: 'Beregner avvik…',
         syncing: 'Synkroniserer…', synced: 'Synkronisert', syncFailed: 'Synkronisering mislyktes',
@@ -928,9 +938,9 @@
       da: {
         settings: 'Indstillinger', language: 'Sprog', timezone: 'Studietidszone', hourFormat: 'Tidsformat',
         pulse: '10s tally-puls', device: 'Enhed', model: 'Model', theme: 'Tema',
-        modelRoom: 'Room Control LED', modelWorld: 'Studie + 5 Verden', modelAnalog: 'Analogt',
+        modelRoom: 'Room Control LED', modelWorld: 'Studie + 6 Verden', modelAnalog: 'Analogt',
         modelSleekAnalog: 'Elegant analogt', modelSleek: 'Elegant', modelBars: 'Søjler', modelBigDisplay: 'Stor skærm',
-        worldHubs: 'Verdensure (5)', masterStudio: 'HOVEDSTUDIE', sameTz: 'STUDIETID',
+        worldHubs: 'Verdensure (6)', masterStudio: 'HOVEDSTUDIE', sameTz: 'STUDIETID',
         resync: 'Synkroniser nu', searching: 'Søger efter tidskilde…', connecting: 'Forbinder…',
         receiving: 'Modtager tidsdata…', calculating: 'Beregner afvigelse…',
         syncing: 'Synkroniserer…', synced: 'Synkroniseret', syncFailed: 'Synkronisering mislykkedes',
@@ -941,9 +951,9 @@
       ru: {
         settings: 'Настройки', language: 'Язык', timezone: 'Часовой пояс студии', hourFormat: 'Формат времени',
         pulse: 'Импульс tally 10с', device: 'Устройство', model: 'Модель', theme: 'Тема',
-        modelRoom: 'Room Control LED', modelWorld: 'Студия + 5 Мировых', modelAnalog: 'Аналоговые',
+        modelRoom: 'Room Control LED', modelWorld: 'Студия + 6 Мировых', modelAnalog: 'Аналоговые',
         modelSleekAnalog: 'Стильные стрелки', modelSleek: 'Стильный', modelBars: 'Полосы', modelBigDisplay: 'Крупный дисплей',
-        worldHubs: 'Мировое время (5 зон)', masterStudio: 'ГЛАВНАЯ СТУДИЯ', sameTz: 'ВРЕМЯ СТУДИИ',
+        worldHubs: 'Мировое время (6 зон)', masterStudio: 'ГЛАВНАЯ СТУДИЯ', sameTz: 'ВРЕМЯ СТУДИИ',
         resync: 'Синхронизировать сейчас', searching: 'Поиск источника…', connecting: 'Подключение…',
         receiving: 'Получение данных…', calculating: 'Расчёт смещения…',
         syncing: 'Синхронизация…', synced: 'Синхронизировано', syncFailed: 'Ошибка синхронизации',
@@ -954,9 +964,9 @@
       zh: {
         settings: '设置', language: '语言', timezone: '演播室时区', hourFormat: '时间格式',
         pulse: '10秒提示脉冲', device: '设备', model: '样式', theme: '主题',
-        modelRoom: 'Room Control LED', modelWorld: '演播室 + 5世界时钟', modelAnalog: '指针',
+        modelRoom: 'Room Control LED', modelWorld: '演播室 + 6世界时钟', modelAnalog: '指针',
         modelSleekAnalog: '时尚指针', modelSleek: '时尚', modelBars: '条状', modelBigDisplay: '大屏',
-        worldHubs: '世界时钟 (5个地区)', masterStudio: '主演播室', sameTz: '同演播室',
+        worldHubs: '世界时钟 (6个地区)', masterStudio: '主演播室', sameTz: '同演播室',
         resync: '立即重新同步', searching: '查找时间源…', connecting: '连接时间源…',
         receiving: '接收时间数据…', calculating: '计算时钟偏差…',
         syncing: '重新同步中…', synced: '已锁定', syncFailed: '同步失败',
@@ -967,9 +977,9 @@
        ro: {
         settings: 'Setări', language: 'Limbă', timezone: 'Fus orar studio', hourFormat: 'Format oră',
         pulse: 'Puls tally 10s', device: 'Dispozitiv', model: 'Model', theme: 'Temă',
-        modelRoom: 'Room Control LED', modelWorld: 'Studio + 5 Glob', modelAnalog: 'Analogic',
+        modelRoom: 'Room Control LED', modelWorld: 'Studio + 6 Glob', modelAnalog: 'Analogic',
         modelSleekAnalog: 'Sleek Analogic', modelSleek: 'Sleek', modelBars: 'Bare', modelBigDisplay: 'Afișaj mare',
-        worldHubs: 'Ceasuri Globale (5 Fusuri)', masterStudio: 'STUDIO PRINCIPAL', sameTz: 'ORA STUDIO',
+        worldHubs: 'Ceasuri Globale (6 Fusuri)', masterStudio: 'STUDIO PRINCIPAL', sameTz: 'ORA STUDIO',
         resync: 'Resincronizează acum', searching: 'Căutare sursă de timp…', connecting: 'Conectare la sursa de timp…',
         receiving: 'Recepție date de timp…', calculating: 'Calculare offset ceas…',
         syncing: 'Resincronizare…', synced: 'Sincronizat', syncFailed: 'Resincronizare eșuată',
@@ -1005,7 +1015,9 @@
       try {
         const raw = store.get('masterclock-world-zones', '');
         const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed) && parsed.length === 5) return parsed;
+        if (Array.isArray(parsed) && parsed.length === 6) return parsed;
+        // Migrate existing five-hub settings without losing the user's selections.
+        if (Array.isArray(parsed) && parsed.length === 5) return [...parsed, DEFAULT_WORLD_ZONES[5]];
       } catch {}
       return [...DEFAULT_WORLD_ZONES];
     }
@@ -1407,7 +1419,7 @@
 
     function buildWorldCards() {
       const frag = document.createDocumentFragment();
-      for (let i = 0; i < 5; i++) {
+      for (let i = 0; i < 6; i++) {
         const card = document.createElement('div');
         card.className = 'world-card';
 
@@ -1465,7 +1477,7 @@
         worldMasterPeriod.textContent = clk.suffix;
         const studioOffsetMin = getZoneOffsetMinutes(tz, date);
 
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 6; i++) {
           const wz = worldZones[i];
           const wp = {};
           for (const part of worldFormatters[i].formatToParts(date)) wp[part.type] = part.value;
@@ -1549,8 +1561,8 @@
     }
     if (selectedZone !== 'UTC' && selectedZone !== 'DEVICE' && !zones.includes(selectedZone)) selectedZone = 'UTC';
 
-    // Populate 5 World Hub selectors in Settings
-    for (let i = 0; i < 5; i++) {
+    // Populate 6 World Hub selectors in Settings
+    for (let i = 0; i < 6; i++) {
       const row = document.createElement('div');
       row.className = 'setting-row';
       const lbl = document.createElement('label');
