@@ -124,6 +124,14 @@ See [LICENSE](LICENSE) for details.
 
 ---
 
+## Third-Party Services
+
+This software may use external time services over HTTP/HTTPS to obtain time synchronization data. These services are independently operated by their respective providers and are not part of this software.
+Use of these services is subject to their respective terms of service, availability policies, and privacy policies.
+The software author is not affiliated with, endorsed by, or responsible for these third-party services.
+
+---
+
 **MasterClock Lite**
 
 *An independent time reference, directly in your browser.*
