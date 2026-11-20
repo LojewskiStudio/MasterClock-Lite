@@ -102,8 +102,6 @@ Internet access is required for external time synchronization. The HTTP Date fal
 
 MasterClock Lite is a browser-based time reference, not a certified precision timekeeping instrument.
 
-Indicative accuracy: approximately **±20 ms under suitable network conditions**.
-
 Actual synchronization performance depends on external time service accuracy, network latency, path asymmetry, browser scheduling, timer resolution and the hosting environment.
 
 The displayed uncertainty is an estimate derived from network sampling and timing assumptions. It is not a guaranteed accuracy specification.
