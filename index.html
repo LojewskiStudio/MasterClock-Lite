@@ -953,20 +953,25 @@
     /* ═══ 8. TIME SYNC & CROSS-TAB COORDINATION ═══════════════ */
     // Ordered list: the FIRST source that answers wins (primary + fallback).
     // No voting / mixing — every page uses the same reference.
-    const API_SOURCES = [
+     const API_SOURCES = [
       {
-      name: 'timeapi.io',
-      url: 'https://timeapi.io/api/time/current/zone?timeZone=UTC',
-      read: async r => parseStrictTimestamp((await r.json())?.dateTime, true)
-      },
-      {
-      name: 'timeapi.world',
-      url: 'https://timeapi.world',
-      read: async r => parseStrictTimestamp((await r.json())?.utc_datetime, false)
-      } 
+        name: 'cloudflare-trace',
+        url: 'https://cloudflare.com',
+           read: async r => {
+            const text = await r.text();
+            const match = text.match(/ts=(\d+(?:\.\d+)?)/);
+            if (!match) throw new Error('Invalid Cloudflare trace');
+            const iso = new Date(parseFloat(match) * 1000).toISOString();
+            return parseStrictTimestamp(iso, false);
+           }
+       },
+       {
+         name: 'timeapi.io',
+         url: 'https://timeapi.io',
+           read: async r => parseStrictTimestamp((await r.json())?.dateTime, true)
+       }
      ];
-
-
+      
     function parseStrictTimestamp(rawVal, allowMissingTzAsUtc = false) {
       if (typeof rawVal !== 'string' || !rawVal.trim()) return NaN;
       let s = trunc3(rawVal.trim());
