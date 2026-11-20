@@ -958,6 +958,11 @@
     //   Cloudflare /cdn-cgi/trace: `ts` is truncated to whole seconds (±1 s) -> NOT usable
     //   worldtimeapi.org shut down; timeapi.world unreachable from the browser -> not used
     const API_SOURCES = [
+        {
+        name: 'timeapi.io',
+        url: 'https://timeapi.io/api/time/current/zone?timeZone=UTC',
+        read: async r => parseStrictTimestamp((await r.json())?.dateTime, true)
+      },
       {
         name: 'utctime.app',
         url: 'https://utctime.app/api/now',
@@ -966,11 +971,6 @@
           if (typeof v !== 'number' || !Number.isFinite(v) || v < 1e12) throw new Error('utctime.app: unix_ms invalid');
           return v;
         }
-      },
-      {
-        name: 'timeapi.io',
-        url: 'https://timeapi.io/api/time/current/zone?timeZone=UTC',
-        read: async r => parseStrictTimestamp((await r.json())?.dateTime, true)
       }
     ];
 
