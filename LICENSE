@@ -19,3 +19,11 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+---
+
+Third-Party Services
+This software may use external time services over HTTP/HTTPS to obtain time synchronization data.
+These services are independently operated by their respective providers and are not part of this software.
+Use of these services is subject to their respective terms of service, availability policies, and privacy policies.
+The software author is not affiliated with, endorsed by, or responsible for these third-party services.
