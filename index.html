@@ -309,7 +309,7 @@
       border: 1px solid #334155; border-radius: 8px; background: rgba(15, 23, 42, 0.85);
       color: #e2e8f0; font-size: 18px; cursor: pointer;
     }
- /* .settings-button:hover { border-color: var(--green); color: var(--green); } */
+    /*.settings-button:hover { border-color: var(--green); color: var(--green); }*/
     .settings-panel {
       position: fixed; z-index: 6; top: 62px; right: 16px; width: min(380px, calc(100vw - 32px));
       max-height: calc(100vh - 78px); overflow-y: auto; padding: 16px 18px;
@@ -953,14 +953,25 @@
     /* ═══ 8. TIME SYNC & CROSS-TAB COORDINATION ═══════════════ */
     // Ordered list: the FIRST source that answers wins (primary + fallback).
     // No voting / mixing — every page uses the same reference.
-     const API_SOURCES = [
-       {
-         name: 'timeapi.io',
-         url: 'https://timeapi.io',
-           read: async r => parseStrictTimestamp((await r.json())?.dateTime, true)
-       }
-     ];
-      
+       const API_SOURCES = [
+     {
+        name: 'Cloudflare',
+        url: 'https://www.cloudflare.com/cdn-cgi/trace',
+            read: async r => {
+            const body = await r.text();
+            const match = body.match(/^ts=(\d+(?:\.\d+)?)/m);
+        if (!match) throw new Error('Cloudflare: timestamp invalid');
+        return parseFloat(match[1]) * 1000;
+        }
+     },
+     {
+        name: 'timeapi.io',
+        url: 'https://timeapi.io/api/Time/current/zone?timeZone=UTC',
+            read: async r => parseStrictTimestamp((await r.json())?.dateTime, true)
+     }
+    ];
+
+
     function parseStrictTimestamp(rawVal, allowMissingTzAsUtc = false) {
       if (typeof rawVal !== 'string' || !rawVal.trim()) return NaN;
       let s = trunc3(rawVal.trim());
