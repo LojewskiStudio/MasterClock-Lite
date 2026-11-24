@@ -175,7 +175,7 @@ The integration is intended for applications that need access to a continuously 
 
 ### Integration Demo
 
-A complete parent-side implementation example is available in [`embed-demo.html`](embed-demo.html).
+A live integration demo, including a complete parent-side implementation, is available [here](https://lojewskistudio.github.io/MasterClock-Lite/embed-demo.html).
 
 ## Configuration
 
