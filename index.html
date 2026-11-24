@@ -1,9 +1,43 @@
 <!DOCTYPE html>
-<!--MASTERCLOCK Broadcast Edition
+<!--MASTERCLOCK LITE - Broadcast Edition ver.01
     Mihai Lucian Lojewski (nov. 2026)
     Copyright (c) 2026 Lojewski Studio
     SPDX-License-Identifier: MIT
+______________________________________________________________________________________
+______________________________________________________________________________________
+______________________________________________________________________________________
+
+MIT License
+
+Copyright (c) 2026 Mihai Lucian Lojewski / Lojewski Studio
+
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+---
+
+Third-Party Services
+This software may use external time services over HTTP/HTTPS to obtain time synchronization data.
+These services are independently operated by their respective providers and are not part of this software.
+Use of these services is subject to their respective terms of service, availability policies, and privacy policies.
+The software author is not affiliated with, endorsed by, or responsible for these third-party services.
 -->
+
 <html lang="en" data-theme="classic">
 <head>
   <meta charset="utf-8">
@@ -1877,6 +1911,113 @@
     applySnapshot(initialSnap, true);
     render();
     synchronize({ manual: false });
+
+    /* ═══ 13. EMBED MODE · postMessage time bridge (read-only) ════
+       Active ONLY with ?embed=true while framed. Without it this block
+       returns immediately: no listener, no timer, no behaviour change.
+
+       The bridge never touches the sync engine. It only READS
+       targetOffset, lastUnc, syncState and the existing helpers, and
+       reports performance.now() + targetOffset - the exact value that
+       render() shows on screen. It never calls synchronize() and never
+       fetches anything.
+
+       Optional URL parameter  parentOrigin=https://host.example
+       pins the one origin allowed to connect (recommended). Without it
+       the origin of the first valid HELLO from window.parent is recorded
+       and every later message must come from that same origin. */
+    (() => {
+      const params = new URLSearchParams(location.search);
+      if (params.get('embed') !== 'true' || window.parent === window) return;
+
+      const PROTO_VERSION = 1;
+      const EMBED_INTERVAL_MS = 100;
+
+      let pinnedOrigin = null;
+      const rawPin = params.get('parentOrigin');
+      if (rawPin) { try { pinnedOrigin = new URL(rawPin).origin; } catch { pinnedOrigin = 'null'; } }
+
+      let parentOrigin = null;
+      let embedTimer = 0;
+      let seq = 0;
+
+      // Source of the anchor currently in use. applySnapshot() publishes it in syncState.extra
+      // ("name" or "name · holdover"); remember the last such value (read-only observation).
+      let lastSource = null;
+      function currentSource() {
+        if (syncState.key === 'synced' && syncState.extra) lastSource = syncState.extra.split(' · ')[0];
+        if (lastSource === null) { try { lastSource = readSyncState()?.source ?? null; } catch {} }
+        return lastSource;
+      }
+
+      // Read-only snapshot of the engine state.
+      function readEngine(monoNow) {
+        if (targetOffset === null) {
+          return {
+            unixMs: null, synchronized: false,
+            syncState: syncState.kind === 'bad' ? 'error' : 'unavailable',
+            accuracyMs: null, source: null, holdover: false, holdoverAgeMs: null
+          };
+        }
+        const age = getHoldoverAgeMs();
+        const holdover =
+          age >= RESYNC_OK_MS + 5000 ||                     // same threshold as getHoldoverText()
+          syncState.key === 'syncFailed' ||                 // last resync failed, running on old anchor
+          // DEPENDENCY: applySnapshot(snap, true) publishes "source · holdover" in syncState.extra. The ' · '
+          // separator is a literal (not translated). If that status format ever changes, update this line
+          // and currentSource(); the regression tests for cached-anchor holdover will fail if it drifts.
+          (syncState.key === 'synced' && syncState.extra.includes(' · '));
+        const k = syncState.kind;
+        const state = holdover ? 'holdover'
+          : (k === 'ok' || (k === 'busy' && lastUnc !== null && lastUnc < GOOD_UNC_MS)) ? 'locked'
+          : 'warning';
+        const unc = effectiveUnc();
+        return {
+          unixMs: Math.floor(monoNow + targetOffset),
+          synchronized: state === 'locked',
+          syncState: state,
+          accuracyMs: unc === null ? null : Math.round(unc * 10) / 10,
+          source: currentSource(),
+          holdover,
+          holdoverAgeMs: Math.round(age)
+        };
+      }
+
+      function post(msg) {
+        if (!parentOrigin) return;
+        try { window.parent.postMessage({ ...msg, version: PROTO_VERSION }, parentOrigin); } catch {}
+      }
+      function sendTime() {
+        const mono = performance.now();
+        post({ type: 'MASTERclock_TIME', seq: ++seq, monotonicMs: mono, ...readEngine(mono) });
+      }
+      function startTimer() {
+        if (!embedTimer) embedTimer = setInterval(sendTime, EMBED_INTERVAL_MS);
+      }
+
+      window.addEventListener('message', e => {
+        if (e.source !== window.parent) return;
+        const d = e.data;
+        if (!d || typeof d !== 'object' || d.version !== PROTO_VERSION) return;
+        if (d.type !== 'MASTERclock_HELLO' && d.type !== 'MASTERclock_REQUEST_TIME') return;
+        // Opaque origins ("null", e.g. file:// parents) cannot be targeted without "*": refuse.
+        if (e.origin === 'null') return;
+        if (pinnedOrigin !== null && e.origin !== pinnedOrigin) return;
+
+        if (d.type === 'MASTERclock_HELLO') {
+          if (parentOrigin && parentOrigin !== e.origin) return;
+          parentOrigin = e.origin;
+          post({ type: 'MASTERclock_READY', intervalMs: EMBED_INTERVAL_MS });
+          sendTime();
+          startTimer();
+        } else if (parentOrigin && e.origin === parentOrigin) {
+          sendTime();   // answered from the existing calculation; no network access
+        }
+      });
+      window.addEventListener('pagehide', () => { clearInterval(embedTimer); embedTimer = 0; });
+      // Restored from the back/forward cache: resume the periodic stream without a new HELLO.
+      window.addEventListener('pageshow', e => { if (e.persisted && parentOrigin) { startTimer(); sendTime(); } });
+    })();
   </script>
 </body>
 </html>
