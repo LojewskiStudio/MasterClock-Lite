@@ -25,20 +25,17 @@ The entire application runs from a single HTML file. No dedicated server, backen
 - **Synchronization Telemetry** – Displays device clock offset, estimated uncertainty, network round-trip time (RTT), active time source and synchronization status.
 - **Six-Location World Clock** – Displays a primary studio clock alongside six configurable global time zones.
 - **Multiple Time Zones** – Supports UTC, local device time and standard IANA time zones.
-- **Multilingual Interface** – Automatically detects the browser language and provides a localized interface in multiple languages, including English, Spanish, French, German etc.
+- **Multilingual Interface** – Automatically detects the browser language and provides a localized interface in multiple languages.
 - **Responsive Interface** – Adapts to desktop monitors, control room displays, tablets and mobile devices.
 - **Persistent Preferences** – Saves configuration locally in the browser without requiring an account.
 - **Cross-Tab Synchronization Coordination** – Shares recent synchronization information between tabs on the same browser origin to reduce redundant requests.
+- **Iframe Integration** – Makes synchronized time information available to external applications through a read-only `postMessage` interface.
 
 ## Time Synchronization
 
 MasterClock Lite obtains its time reference from external UTC time services.
 
-The synchronization sources are used in the following order:
-
-1. – Primary time source.
-2. – Secondary source, automatically used when the primary source cannot provide a valid response.
-3. – Additional fallback using the HTTP `Date` response header from the hosting server.
+The synchronization system uses a primary time source, an alternative source when the primary source cannot provide a valid response, and an additional HTTP `Date` fallback when API sources are unavailable.
 
 The application evaluates available time samples and establishes an internal time reference based on the browser's monotonic clock.
 
@@ -61,6 +58,52 @@ Additional synchronization telemetry includes:
 - **RTT** – Network request round-trip time, when available.
 - **Source** – Currently active time source.
 - **Holdover** – Indicates continued operation from a previously acquired time reference.
+
+## Iframe Integration
+
+MasterClock Lite can provide its synchronized time reference to another web application through an embedded iframe.
+
+The integration uses the browser's native `postMessage` API and does not require a separate backend or additional software.
+
+To enable the integration, add `?embed=true` to the application URL:
+
+```html
+<iframe
+  src="https://lojewskistudio.github.io/MasterClock-Lite/?embed=true"
+  title="MasterClock Lite"
+></iframe>
+```
+
+### Integration Protocol
+
+The embedded interface uses a versioned message protocol:
+
+- `MASTERclock_HELLO` – Initiates communication between the host application and MasterClock Lite.
+- `MASTERclock_READY` – Confirms that the embedded interface is ready.
+- `MASTERclock_REQUEST_TIME` – Requests a time update.
+- `MASTERclock_TIME` – Provides the current time reference and synchronization information.
+
+Time updates are transmitted periodically, with an interval of approximately 100 milliseconds.
+
+### Available Time Data
+
+The integration can provide:
+
+- `unixMs` – Current Unix timestamp in milliseconds.
+- `synchronized` – Indicates whether a valid time reference has been acquired.
+- `syncState` – Current synchronization state.
+- `accuracyMs` – Estimated synchronization uncertainty in milliseconds.
+- `source` – Active time source.
+- `holdover` – Indicates whether the clock is operating in Holdover mode.
+- `holdoverAgeMs` – Time elapsed since the last valid synchronization reference.
+
+### Security and Operation
+
+The iframe interface is read-only. It reports the existing internal time reference without initiating synchronization requests or modifying the clock engine.
+
+Communication is restricted to the embedding parent window and validated against the expected origin. An optional `parentOrigin` URL parameter can be used to explicitly pin the permitted parent origin.
+
+The integration is intended for applications that need access to a continuously maintained time reference without implementing their own time synchronization engine.
 
 ## Configuration
 
@@ -94,9 +137,10 @@ Internet access is required for external time synchronization. The HTTP Date fal
 - Internationalization API
 - `requestAnimationFrame` rendering
 - Web Storage API (`localStorage`, `sessionStorage`)
+- Browser `postMessage` API
 - Optional Screen Wake Lock API support
 
-**Zero external dependencies or frameworks.**
+**No external JavaScript libraries or frameworks.**
 
 ## Important Notes
 
@@ -125,7 +169,9 @@ See [LICENSE](LICENSE) for details.
 ## Third-Party Services
 
 This software may use external time services over HTTP/HTTPS to obtain time synchronization data. These services are independently operated by their respective providers and are not part of this software.
+
 Use of these services is subject to their respective terms of service, availability policies, and privacy policies.
+
 The software author is not affiliated with, endorsed by, or responsible for these third-party services.
 
 ---
