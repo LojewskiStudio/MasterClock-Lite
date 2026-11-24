@@ -2,7 +2,9 @@
 
 **An independent browser-based time reference for studios, control rooms, and live production environments.**
 
+
 <img width="1933" height="1080" alt="MasterClock Lite" src="https://github.com/user-attachments/assets/8b02f8fe-7903-4321-a847-2c54c9b3c98d" />
+
 
 MasterClock Lite is a lightweight, standalone HTML application designed for environments where a clear, continuous and reliable time reference is essential.
 
@@ -11,6 +13,15 @@ Unlike conventional clocks that simply display the computer's system time, Maste
 It combines synchronized time display, millisecond resolution, global time monitoring and operational synchronization diagnostics in a single browser application.
 
 The entire application runs from a single HTML file. No dedicated server, backend, build process or additional software installation is required.
+
+## Browser Application
+
+**[Open MasterClock Lite](https://lojewskistudio.github.io/MasterClock-Lite/)**
+
+MasterClock Lite runs directly in your browser. No installation, downloads or server setup are required.
+
+Internet access is required for external time synchronization. The HTTP `Date` fallback additionally requires the application to be served over HTTP or HTTPS.
+
 
 ## Features
 
@@ -190,14 +201,6 @@ The settings panel provides access to:
 All preferences are stored locally in the browser using `localStorage`.
 
 No account or external configuration is required.
-
-## Browser Application
-
-**[Open MasterClock Lite](https://lojewskistudio.github.io/MasterClock-Lite/)**
-
-MasterClock Lite runs directly in your browser. No installation, downloads or server setup are required.
-
-Internet access is required for external time synchronization. The HTTP `Date` fallback additionally requires the application to be served over HTTP or HTTPS.
 
 ## Technical Details
 
