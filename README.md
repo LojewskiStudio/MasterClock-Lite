@@ -82,7 +82,6 @@ The integration is disabled by default and can be enabled using `?embed=true`.
   title="MasterClock Lite"
   width="100%"
   height="480"
-  style="border:0"
 ></iframe>
 ```
 
